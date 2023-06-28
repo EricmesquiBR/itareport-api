@@ -1,0 +1,7 @@
+node_modules
+# Keep environment variables out of version control
+.env
+
+#nodejs
+node_modules
+node_modules/*
