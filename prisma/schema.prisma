@@ -37,12 +37,12 @@ model Denuncia {
   userId      String      @db.Uuid
   catId       String      @db.Uuid
   user        Usuario     @relation(fields: [userId], references: [id_user])
-  category    Categoria   @relation(fields: [catId], references: [id_report])
+  category    Categoria   @relation(fields: [catId], references: [id_categoria])
 }
 
 
 model Categoria {
-  id_report       String     @id @default(uuid()) @db.Uuid
+  id_categoria    String     @id @default(uuid()) @db.Uuid
   nome_categoria  String     @db.VarChar(50)
   denuncias       Denuncia[]
 }

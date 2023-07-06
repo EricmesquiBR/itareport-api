@@ -1,5 +1,6 @@
 import { PrismaClient, Usuario } from "@prisma/client"
 
+
 const prisma = new PrismaClient()
 
 async function CriarUsuario(userData: Partial<Usuario>): Promise<Usuario> {
