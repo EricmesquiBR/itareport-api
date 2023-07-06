@@ -31,10 +31,10 @@ CREATE TABLE "Denuncia" (
 
 -- CreateTable
 CREATE TABLE "Categoria" (
-    "id_report" UUID NOT NULL,
+    "id_categoria" UUID NOT NULL,
     "nome_categoria" VARCHAR(50) NOT NULL,
 
-    CONSTRAINT "Categoria_pkey" PRIMARY KEY ("id_report")
+    CONSTRAINT "Categoria_pkey" PRIMARY KEY ("id_categoria")
 );
 
 -- CreateIndex
@@ -44,4 +44,4 @@ CREATE UNIQUE INDEX "Usuario_email_key" ON "Usuario"("email");
 ALTER TABLE "Denuncia" ADD CONSTRAINT "Denuncia_userId_fkey" FOREIGN KEY ("userId") REFERENCES "Usuario"("id_user") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Denuncia" ADD CONSTRAINT "Denuncia_catId_fkey" FOREIGN KEY ("catId") REFERENCES "Categoria"("id_report") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Denuncia" ADD CONSTRAINT "Denuncia_catId_fkey" FOREIGN KEY ("catId") REFERENCES "Categoria"("id_categoria") ON DELETE RESTRICT ON UPDATE CASCADE;
