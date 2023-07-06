@@ -1,14 +1,9 @@
 const reportService = require("../services/reportService");
-const adressService = require("../services/adressService");
-
 
 async function createReport(req, res) {
   try {
-    const { id } = req.params;
-    const { title, content, street, district, city } = req.body;
-    
-    let adress = await adressService.insertAdress(street,district,city);
-    let report = await reportService.createReport(title, content, id, adress);
+    const { title, content, id, idCat, street, district, city } = req.body;
+    let report = await reportService.createReport(title, content, id, idCat, street, district, city);
 
     return res.json({
       success: true,
@@ -16,7 +11,7 @@ async function createReport(req, res) {
       message: "Report created successfully",
     });
   } catch (error) {
-    return res.json({ error });
+    return res.json({ message: "Erro :(" });
   }
 }
 
