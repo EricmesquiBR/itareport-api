@@ -3,7 +3,7 @@ const reportController = require("../controllers/reportController");
 const express = require("express");
 const router = express.Router();
 
-router.post("/report/:id", reportController.createReport);
+router.post("/report", reportController.createReport);
 router.get("/reports", reportController.findAllReports);
 router.get("/report/:id", reportController.findReportById);
 router.put("/report/:id", reportController.UpdateReport);
