@@ -13,6 +13,12 @@ async function insertAdress(rua, bairro, cidade) {
     return adress.id_adress;
   }
 
+async function findAllAdresses() {
+    const adresses = await prismaClient.endereco.findMany()
+    return adresses
+}
+
 module.exports = {
     insertAdress,
+    findAllAdresses
 }
