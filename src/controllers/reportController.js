@@ -2,8 +2,8 @@ const reportService = require("../services/reportService");
 
 async function createReport(req, res) {
   try {
-    const { title, content, id, idCat, street, district, city } = req.body;
-    let report = await reportService.createReport(title, content, id, idCat, street, district, city);
+    const { title, content, id, idCat, street, district, city, lat, lng } = req.body;
+    let report = await reportService.createReport(title, content, id, idCat, street, district, city, lat, lng);
 
     return res.json({
       success: true,
