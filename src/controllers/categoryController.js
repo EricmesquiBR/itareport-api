@@ -37,7 +37,7 @@ async function findReportByCategoryId(req,res){
       if (!report) {
         return res.json({
           success: false,
-          data: { report },
+          data: report,
           message: "Could not find reports in this category",
         });
       }
