@@ -1,9 +1,9 @@
-import { PrismaClient, Usuario } from "@prisma/client"
+import { prismaClient } from "../db/prismaClient"
 
 
-const prisma = new PrismaClient()
+const prisma = new prismaClient()
 
-async function CriarUsuario(userData: Partial<Usuario>): Promise<Usuario> {
+async function CriarUsuario(userData) {
     const usuario = await prisma.usuario.create({
         data: {
             name: userData.name || "",

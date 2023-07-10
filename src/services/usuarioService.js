@@ -18,7 +18,7 @@ async function findUserByEmail(email) {
 
 async function findUserById(id) {
     const user = prismaClient.usuario.findFirst({
-        where: { id_user: String(id) }
+        where: { id_user: id }
     })
 
     return user
@@ -31,7 +31,7 @@ async function findAllUsers() {
 
 async function updateUser(id, name, email) {
     const user = await prismaClient.usuario.update({
-        where: { id_user: String(id) },
+        where: { id_user: id },
         data: { name, email }
     })
 
@@ -39,7 +39,7 @@ async function updateUser(id, name, email) {
 }
 
 async function deleteUserById(id) {
-    return prismaClient.usuario.delete({ where: { id_user: String(id) } })
+    return prismaClient.usuario.delete({ where: { id_user: id } })
 }
 
 module.exports = {

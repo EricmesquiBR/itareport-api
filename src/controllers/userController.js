@@ -3,7 +3,7 @@ const userService = require("../services/usuarioService")
 async function createUser(req, res) {
     try {
         const { name, cpf, email, password } = req.body
-        let usuario = await userService.findUserByEmail(email)
+        const usuario = await userService.findUserByEmail(email)
 
         if (usuario) {
             return res.json({
@@ -15,9 +15,11 @@ async function createUser(req, res) {
 
         usuario = await userService.createUser(name, cpf, email, password)
 
+        usuarioSemSenha = { ...usuario }
+
         return res.json({
             success: true,
-            data: usuario,
+            data: usuarioSemSenha,
             message: "User created successfully"
         })
     } catch (error) {
@@ -27,10 +29,9 @@ async function createUser(req, res) {
 
 async function checkUserCredentials(req, res) {
     try {
-        const { email: email, password: password } = req.body
-        let usuario = await userService.findUserByEmail(email)
-        usuarioWithoutPassword = { ...usuario }
-        delete usuarioWithoutPassword.password
+        const { email, password } = req.body
+        const usuario = await userService.findUserByEmail(email)
+        const usuarioSemSenha = { ...usuario }
 
         if (!usuario) {
             return res.json({
@@ -50,7 +51,7 @@ async function checkUserCredentials(req, res) {
 
         return res.json({
             success: true,
-            data: usuarioWithoutPassword,
+            data: usuarioSemSenha,
             message: "User logged in successfully"
         })
     } catch (error) {
@@ -60,15 +61,21 @@ async function checkUserCredentials(req, res) {
 
 async function findAllUsers(req, res) {
     try {
-        const users = await userService.findAllUsers()
+        const usuarios = await userService.findAllUsers()
+        const usuariosSemSenha = usuarios.map(user => {
+            const { password, ...usuarioSemSenha } = user
+            return usuarioSemSenha
+        })
+
         return res.json({
             success: true,
-            data: users,
+            data: usuariosSemSenha,
             message: "Users found successfully"
         })
-    } catch (error) {
-        return res.json({ error })
     }
+    catch (error) {
+        return res.json({ error })
+    }  
 }
 
 async function findUser(req, res) {
@@ -76,17 +83,19 @@ async function findUser(req, res) {
         const { id } = req.params
         const usuario = await userService.findUserById(id)
 
+        const usuarioSemSenha = { ...usuario }
+
         if (!usuario) {
             return res.json({
                 success: false,
-                data: { usuario },
+                data: { usuarioSemSenha },
                 message: "Could not find this user"
             })
         }
 
         return res.json({
             success: true,
-            data: usuario,
+            data: usuarioSemSenha,
             message: "User found successfully"
         })
     } catch (error) {
@@ -97,9 +106,9 @@ async function findUser(req, res) {
 async function updateUser(req, res) {
     try {
         const { id } = req.params
-        const { name, email } = req.body
+        const { name, email, password } = req.body
 
-        let usuario = await userService.updateUser(id)
+        const usuario = await userService.findUserById(id)
 
         if (!usuario) {
             return res.json({
@@ -108,17 +117,22 @@ async function updateUser(req, res) {
                 message: "Could not update this user"
             })
         }
-        user = await userService.updateUser(id, name, email)
+
+        const novoUsuario = await userService.updateUser(id, name, email, password)
+
+        const usuarioSemSenha = { ...novoUsuario }
 
         return res.json({
             success: true,
-            data: user,
+            data: usuarioSemSenha,
             message: "User updated successfully"
         })
-    } catch (error) {
+    }
+    catch (error) {
         return res.json({ error })
     }
 }
+
 async function deleteUser(req, res) {
     try {
         const { id } = req.params
