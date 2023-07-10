@@ -57,7 +57,7 @@ async function findAllReports(req, res) {
   }
 }
 
-async function UpdateReport(req,res){
+async function updateReport(req,res){
   try{
     const { id } = req.params;
 
@@ -103,7 +103,7 @@ module.exports = {
   createReport,
   findReportById,
   findAllReports,
-  UpdateReport,
+  updateReport,
   deleteReport
 
 };

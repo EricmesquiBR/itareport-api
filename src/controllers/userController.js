@@ -26,7 +26,6 @@ async function createUser(req, res) {
 }
 
 async function checkUserCredentials(req, res) {
-    //function thats gonna get user email and password and check if they are correct
     try {
         const { email: email, password: password } = req.body
         let usuario = await userService.findUserByEmail(email)

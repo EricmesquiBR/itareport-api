@@ -24,7 +24,7 @@ async function findAllReport() {
   return reports;
 }
 
-async function UpdateReport() {
+async function updateReport() {
   return null;
 }
 
@@ -35,6 +35,6 @@ module.exports = {
   createReport,
   findReportById,
   findAllReport,
-  UpdateReport,
+  updateReport,
   deleteReportById
 };
