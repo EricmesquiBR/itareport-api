@@ -14,7 +14,7 @@ async function createReport(req, res) {
     })
     
   } catch (error) {
-    return res.json({ message: "Erro :(" })
+    return res.json({ error: "Erro :(" })
   }
 }
 
