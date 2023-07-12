@@ -1,11 +1,18 @@
 const prismaClient = require("../db/prismaClient");
 
-async function createReport(titulo, conteudo,id, idAdress) {
+async function createReport(titulo, conteudo, id, idCat, rua, bairro, cidade, lat, lng) {
   const report = await prismaClient.Denuncia.create({
-    data: { title: titulo,
+    data: {
+            title: titulo,
             content: conteudo,
             userId: id,
-            adressId: idAdress },
+            catId: idCat,
+            street: rua,
+            district: bairro,
+            city: cidade, 
+            lat: lat,
+            lng: lng
+          },
   });
 
   return report;
@@ -24,7 +31,7 @@ async function findAllReport() {
   return reports;
 }
 
-async function UpdateReport() {
+async function updateReport() {
   return null;
 }
 
@@ -35,6 +42,6 @@ module.exports = {
   createReport,
   findReportById,
   findAllReport,
-  UpdateReport,
+  updateReport,
   deleteReportById
 };

@@ -1,101 +1,105 @@
-const reportService = require("../services/reportService");
-const adressService = require("../services/adressService");
-
+const reportService = require("../services/reportService")
 
 async function createReport(req, res) {
   try {
-    const { id } = req.params;
-    const { title, content, street, district, city } = req.body;
-    
-    let adress = await adressService.insertAdress(street,district,city);
-    let report = await reportService.createReport(title, content, id, adress);
+    const { title, content, id, idCat, street, district, city, lat, lng } = req.body
+    const report = await reportService.createReport(title, content, id, idCat, street, district, city, lat, lng)
+
+    const reportData = { id, title, content }
 
     return res.json({
       success: true,
-      data: report,
+      data: reportData,
       message: "Report created successfully",
-    });
+    })
+    
   } catch (error) {
-    return res.json({ error });
+    return res.json({ error: "Erro :(" })
   }
 }
 
 async function findReportById(req,res){
   try{
-    const { id } = req.params;
+    const { id } = req.params
 
-    const report =  await reportService.findReportById(id);
+    const report =  await reportService.findReportById(id)
 
     if (!report) {
       return res.json({
         success: false,
-        data: { report },
+        data: report ,
         message: "Could not find this report",
-      });
+      })
     }
 
     return res.json({
       success: true,
       data: report,
       message: "report found successfully",
-    });
+    })
+
   }catch(error){
-    return res.json({ error });
+    return res.json({ error })
   }
 }
 
 async function findAllReports(req, res) {
   try {
-    const reports = await reportService.findAllReport();
+    const reports = await reportService.findAllReport()
+
     return res.json({
       success: true,
       data: reports,
       message: "Reports found successfully",
-    });
+    })
+
   } catch (error) {
-    return res.json({ error });
+    return res.json({ error })
   }
 }
 
-async function UpdateReport(req,res){
+async function updateReport(req,res){
   try{
-    const { id } = req.params;
+    const { id } = req.params
 
-    const report =  await reportService.findReportById(id);
+    const report =  await reportService.findReportById(id)
 
     if (!report) {
       return res.json({
         success: false,
-        data: { report },
+        data: report,
         message: "The update is not yet available",
-      });
+      })
+
     }
   }catch(error){
-    return res.json({ error });
+    return res.json({ error })
   }
 }
 
 async function deleteReport(req, res) {
   try {
-    const { id } = req.params;
+    const { id } = req.params
 
-    const report = await reportService.findReportById(id);
+    const report = await reportService.findReportById(id)
+
     if (!report) {
       return res.json({
         success: false,
-        data: { id },
+        data: id,
         message: "Could not find this report",
-      });
+      })
     }
 
-    await reportService.deleteReportById(id);
+    await reportService.deleteReportById(id)
     return res.json({
       success: true,
-      data: { id },
+      data: id,
       message: "Report deleted successfully",
-    });
+    })
+
   } catch (error) {
-    return res.json({ error });
+    return res.json({ error })
   }
 }
 
@@ -103,7 +107,7 @@ module.exports = {
   createReport,
   findReportById,
   findAllReports,
-  UpdateReport,
+  updateReport,
   deleteReport
 
-};
+}

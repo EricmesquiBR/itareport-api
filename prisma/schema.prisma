@@ -22,40 +22,30 @@ model Usuario {
   
 }
 
-model Endereco {
-  id_adress  String     @id @default(uuid()) @db.Uuid
-  street     String     @db.VarChar(100)
-  district   String     @db.VarChar(20)
-  city       String     @db.VarChar(30)
-  lat        Float      @db.Real()
-  lon        Float      @db.Real()
-  denuncias Denuncia[] 
-}
-
 model Denuncia {
-  id_report   String    @id @default(uuid()) @db.Uuid
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  validated   Boolean   @default(false)
-  title       String    @db.VarChar(255)
-  content     String    @db.Text
-  userId      String    @db.Uuid
-  adressId    String    @db.Uuid
-  user        Usuario   @relation(fields: [userId], references: [id_user])
-  adress      Endereco  @relation(fields: [adressId], references: [id_adress])
+  id_report   String      @id @default(uuid()) @db.Uuid
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  validated   Boolean     @default(false)
+  title       String      @db.VarChar(255)
+  content     String      @db.Text
+  street      String      @db.VarChar(100)
+  district    String      @db.VarChar(20)
+  city        String      @db.VarChar(30)
+  lat         Float       @db.Real()
+  lng         Float       @db.Real() 
+  userId      String      @db.Uuid
+  catId       String      @db.Uuid
+  user        Usuario     @relation(fields: [userId], references: [id_user])
+  category    Categoria   @relation(fields: [catId], references: [id_categoria])
 }
-  //categoriaId String    @db.Uuid
-  //enderecoId  String    @db.Uuid
-  //Categoria   Categoria @relation(fields: [categoriaId], references: [id_report])
-  //Endereco    Endereco  @relation(fields: [enderecoId], references: [id_endereco])
 
 
+model Categoria {
+  id_categoria    String     @id @default(uuid()) @db.Uuid
+  nome_categoria  String     @db.VarChar(50)
+  denuncias       Denuncia[]
+}
 
-//model Categoria {
-//  id_report       String     @id @default(uuid()) @db.Uuid
-//  nome_categoria  String     @db.VarChar(50)
-//  denuncias       Denuncia[]
-//}
-//
 
 
