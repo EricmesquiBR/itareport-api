@@ -3,9 +3,12 @@ const userRoutes = require("./api/userRoute");
 const reportRoutes = require("./api/reportRoute");
 const categoryRoute = require("./api/categoryRoute")
 const config = require("./config/default");
+const cors = require("cors");
+
 
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 app.use(userRoutes, reportRoutes, categoryRoute);
 
