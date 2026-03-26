@@ -1,18 +1,15 @@
 {
   // For Node/Bun tooling files (e.g. vite.config.ts, scripts).
   "$schema": "https://json.schemastore.org/tsconfig",
-  "extends": "./base.json",
+  "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "target": "ES2023",
-    "lib": [
-      "ES2023"
-    ],
-    "types": [
-      "node"
-    ],
+    "lib": ["ES2023"],
+    "types": ["node"],
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
     "noUncheckedSideEffectImports": true
-  }
+  },
+  "include": ["src/**/*"]
 }

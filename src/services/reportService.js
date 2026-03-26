@@ -1,52 +1,60 @@
-const prismaClient = require("../db/prismaClient");
+import { db } from "../db/index.ts";
+import { reports } from "../db/schema.ts";
+import { eq } from "drizzle-orm";
 
-async function createReport(titulo, conteudo, id, idCat, rua, bairro, cidade, lat, lng) {
-  const report = await prismaClient.Denuncia.create({
-    data: {
-            title: titulo,
-            content: conteudo,
-            userId: id,
-            catId: idCat,
-            street: rua,
-            district: bairro,
-            city: cidade, 
-            lat: lat,
-            lng: lng
-          },
+export async function createReport(titulo, conteudo, idUser, idCat, rua, bairro, cidade, lat, lng) {
+  const [report] = await db
+    .insert(reports)
+    .values({
+      title: titulo,
+      content: conteudo,
+      userId: idUser,
+      categoryId: idCat,
+      street: rua,
+      district: bairro,
+      city: cidade,
+      lat: lat,
+      lng: lng,
+    })
+    .returning();
+
+  return report;
+}
+
+export async function findReportById(id) {
+  const report = await db.query.reports.findFirst({
+    where: eq(reports.id, id),
   });
 
   return report;
 }
 
-async function findReportById(id) {
-  const report = await prismaClient.Denuncia.findFirst({
-    where: { id_report: id },
-  });
+export async function findAllReport() {
+  const reportsList = await db.query.reports.findMany();
+  return reportsList;
+}
+
+export async function updateReport(
+  id,
+  title,
+  content,
+  street,
+  district,
+  city,
+  lat,
+  lng,
+  categoryId,
+) {
+  const [report] = await db
+    .update(reports)
+    .set({ title, content, street, district, city, lat, lng, categoryId })
+    .where(eq(reports.id, id))
+    .returning();
 
   return report;
 }
 
-async function findAllReport() {
-  const reports = await prismaClient.Denuncia.findMany();
-  return reports;
+export async function deleteReportById(id) {
+  const [deletedReport] = await db.delete(reports).where(eq(reports.id, id)).returning();
+  return deletedReport;
 }
-
-async function updateReport(id, title, content, street, district, city, lat, lng, catId) {
-  const report = await prismaClient.Denuncia.update({
-    where: { id_report: id },
-    data: { title, content, street, district, city, lat, lng, catId },
-  });
-
-  return report;
-}
-
-async function deleteReportById(id) {
-  return prismaClient.Denuncia.delete({ where: { id_report: String(id) } });
-}
-module.exports = {
-  createReport,
-  findReportById,
-  findAllReport,
-  updateReport,
-  deleteReportById
-};

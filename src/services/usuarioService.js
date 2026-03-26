@@ -1,56 +1,45 @@
-const prismaClient = require("../db/prismaClient")
+import { db } from "../db/index.ts";
+import { users } from "../db/schema.ts";
+import { eq } from "drizzle-orm";
 
-async function createUser(name, cpf, email, password) {
-    const usuario = await prismaClient.usuario.create({
-        data: { name, cpf, email, password }
-    })
+export async function createUser(name, cpf, email, password) {
+  const [usuario] = await db.insert(users).values({ name, cpf, email, password }).returning();
 
-    return usuario
+  return usuario;
 }
 
-async function findUserByEmail(email) {
-    const usuario = await prismaClient.usuario.findUnique({
-        where: { email }
-    })
+export async function findUserByEmail(email) {
+  const usuario = await db.query.users.findFirst({
+    where: eq(users.email, email),
+  });
 
-    return usuario
+  return usuario;
 }
 
-async function findUserById(id) {
-    const user = await prismaClient.usuario.findFirst({
-        where: { id_user: id }
-    })
+export async function findUserById(id) {
+  const user = await db.query.users.findFirst({
+    where: eq(users.id, id),
+  });
 
-    return user
+  return user;
 }
 
-async function findAllUsers() {
-    const users = await prismaClient.usuario.findMany()
-    return users
+export async function findAllUsers() {
+  const usersList = await db.query.users.findMany();
+  return usersList;
 }
 
-async function updateUser(id, name, email, password) {
-    const data = { name, email }
-    if (password) {
-        data.password = password
-    }
-    const user = await prismaClient.usuario.update({
-        where: { id_user: id },
-        data
-    })
+export async function updateUser(id, name, email, password) {
+  const data = { name, email };
+  if (password) {
+    data.password = password;
+  }
+  const [user] = await db.update(users).set(data).where(eq(users.id, id)).returning();
 
-    return user
+  return user;
 }
 
-async function deleteUserById(id) {
-    return prismaClient.usuario.delete({ where: { id_user: id } })
-}
-
-module.exports = {
-    createUser,
-    findAllUsers,
-    deleteUserById,
-    updateUser,
-    findUserById,
-    findUserByEmail
+export async function deleteUserById(id) {
+  const [deletedUser] = await db.delete(users).where(eq(users.id, id)).returning();
+  return deletedUser;
 }

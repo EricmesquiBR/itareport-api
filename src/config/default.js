@@ -1,4 +1,4 @@
-require("dotenv").config();
+import "dotenv/config";
 
 const config = {
   server: {
@@ -7,4 +7,4 @@ const config = {
   },
 };
 
-module.exports = config;
+export default config;

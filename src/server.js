@@ -1,10 +1,9 @@
-const express = require("express");
-const userRoutes = require("./api/userRoute");
-const reportRoutes = require("./api/reportRoute");
-const categoryRoute = require("./api/categoryRoute")
-const config = require("./config/default");
-const cors = require("cors");
-
+import express from "express";
+import userRoutes from "./api/userRoute.js";
+import reportRoutes from "./api/reportRoute.js";
+import categoryRoute from "./api/categoryRoute.js";
+import config from "./config/default.js";
+import cors from "cors";
 
 const app = express();
 

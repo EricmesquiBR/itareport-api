@@ -1,45 +1,45 @@
 {
-    "typescript.tsdk": "./node_modules/typescript/lib",
-    "typescript.preferences.importModuleSpecifier": "relative",
-    "typescript.enablePromptUseWorkspaceTsdk": true,
-    "editor.formatOnSave": true,
-    "oxc.fmt.configPath": ".oxfmtrc.json",
-    "oxc.typeAware": true,
-    "[json]": {
-        "editor.defaultFormatter": "vscode.json-language-features"
-    },
-    "[markdown]": {
-        "editor.defaultFormatter": "oxc.oxc-vscode",
-    },
-    "[javascript]": {
-        "editor.defaultFormatter": "oxc.oxc-vscode"
-    },
-    "[javascriptreact]": {
-        "editor.defaultFormatter": "oxc.oxc-vscode"
-    },
-    "[typescript]": {
-        "editor.defaultFormatter": "oxc.oxc-vscode"
-    },
-    "[typescriptreact]": {
-        "editor.defaultFormatter": "oxc.oxc-vscode"
-    },
-    "editor.codeActionsOnSave": {
-        "source.fixAll.oxc": "explicit"
-    },
-    "editor.quickSuggestions": {
-        "other": true,
-        "comments": false,
-        "strings": false
-    },
-    "editor.acceptSuggestionOnCommitCharacter": true,
-    "editor.acceptSuggestionOnEnter": "on",
-    "editor.quickSuggestionsDelay": 10,
-    "editor.suggestOnTriggerCharacters": true,
-    "editor.tabCompletion": "off",
-    "editor.suggest.localityBonus": true,
-    "editor.suggestSelection": "recentlyUsed",
-    "editor.wordBasedSuggestions": "matchingDocuments",
-    "editor.parameterHints.enabled": true,
-    "editor.tabSize": 2,
-    "files.insertFinalNewline": true,
+  "typescript.tsdk": "./node_modules/typescript/lib",
+  "typescript.preferences.importModuleSpecifier": "relative",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "editor.formatOnSave": true,
+  "oxc.fmt.configPath": ".oxfmtrc.json",
+  "oxc.typeAware": true,
+  "[json]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  },
+  "[markdown]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  },
+  "editor.codeActionsOnSave": {
+    "source.fixAll.oxc": "explicit"
+  },
+  "editor.quickSuggestions": {
+    "other": true,
+    "comments": false,
+    "strings": false
+  },
+  "editor.acceptSuggestionOnCommitCharacter": true,
+  "editor.acceptSuggestionOnEnter": "on",
+  "editor.quickSuggestionsDelay": 10,
+  "editor.suggestOnTriggerCharacters": true,
+  "editor.tabCompletion": "off",
+  "editor.suggest.localityBonus": true,
+  "editor.suggestSelection": "recentlyUsed",
+  "editor.wordBasedSuggestions": "matchingDocuments",
+  "editor.parameterHints.enabled": true,
+  "editor.tabSize": 2,
+  "files.insertFinalNewline": true
 }

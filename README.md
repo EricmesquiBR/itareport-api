@@ -62,31 +62,31 @@ REST API backend for [Itareport](../itareport) — a community-driven platform f
 
 ### Users
 
-| Method | Endpoint        | Description          |
-| ------ | --------------- | -------------------- |
-| GET    | `/users`        | List all users       |
-| GET    | `/user/:id`     | Get user by ID       |
-| POST   | `/user`         | Create a new user    |
-| PUT    | `/user/:id`     | Update a user        |
-| DELETE | `/user/:id`     | Delete a user        |
+| Method | Endpoint    | Description       |
+| ------ | ----------- | ----------------- |
+| GET    | `/users`    | List all users    |
+| GET    | `/user/:id` | Get user by ID    |
+| POST   | `/user`     | Create a new user |
+| PUT    | `/user/:id` | Update a user     |
+| DELETE | `/user/:id` | Delete a user     |
 
 ### Reports (Denuncias)
 
-| Method | Endpoint        | Description          |
-| ------ | --------------- | -------------------- |
-| GET    | `/reports`      | List all reports     |
-| GET    | `/report/:id`   | Get report by ID     |
-| POST   | `/report`       | Create a new report  |
-| PUT    | `/report/:id`   | Update a report      |
-| DELETE | `/report/:id`   | Delete a report      |
+| Method | Endpoint      | Description         |
+| ------ | ------------- | ------------------- |
+| GET    | `/reports`    | List all reports    |
+| GET    | `/report/:id` | Get report by ID    |
+| POST   | `/report`     | Create a new report |
+| PUT    | `/report/:id` | Update a report     |
+| DELETE | `/report/:id` | Delete a report     |
 
 ### Categories
 
-| Method | Endpoint          | Description            |
-| ------ | ----------------- | ---------------------- |
-| GET    | `/category`       | List all categories    |
-| GET    | `/category/:id`   | Get category by ID     |
-| POST   | `/category/:id`   | Create a new category  |
+| Method | Endpoint        | Description           |
+| ------ | --------------- | --------------------- |
+| GET    | `/category`     | List all categories   |
+| GET    | `/category/:id` | Get category by ID    |
+| POST   | `/category/:id` | Create a new category |
 
 ## Database Schema
 
