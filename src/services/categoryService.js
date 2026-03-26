@@ -1,18 +1,20 @@
 const prismaClient = require("../db/prismaClient");
 
 async function createCategory(name){
-    const cate = prismaClient.Categoria.create({
+    const category = await prismaClient.Categoria.create({
         data: { nome_categoria: name},
     })
+
+    return category
 }
 
 
 async function findReportByCategory(id) {
-    const repor = prismaClient.Denuncia.findMany({
+    const reports = await prismaClient.Denuncia.findMany({
       where: { catId: id },
     });
-  
-    return repor;
+
+    return reports;
   }
   
   async function findAllCategory() {

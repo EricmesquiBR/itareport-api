@@ -5,29 +5,25 @@ async function createReport(req, res) {
     const { title, content, id, idCat, street, district, city, lat, lng } = req.body
     const report = await reportService.createReport(title, content, id, idCat, street, district, city, lat, lng)
 
-    const reportData = { id, title, content }
-
-    return res.json({
+    return res.status(201).json({
       success: true,
-      data: reportData,
+      data: report,
       message: "Report created successfully",
     })
-    
+
   } catch (error) {
-    return res.json({ error: "Erro :(" })
+    return res.status(500).json({ success: false, error: error.message })
   }
 }
 
-async function findReportById(req,res){
-  try{
+async function findReportById(req, res) {
+  try {
     const { id } = req.params
-
-    const report =  await reportService.findReportById(id)
+    const report = await reportService.findReportById(id)
 
     if (!report) {
-      return res.json({
+      return res.status(404).json({
         success: false,
-        data: report ,
         message: "Could not find this report",
       })
     }
@@ -35,11 +31,11 @@ async function findReportById(req,res){
     return res.json({
       success: true,
       data: report,
-      message: "report found successfully",
+      message: "Report found successfully",
     })
 
-  }catch(error){
-    return res.json({ error })
+  } catch (error) {
+    return res.status(500).json({ success: false, error: error.message })
   }
 }
 
@@ -54,39 +50,47 @@ async function findAllReports(req, res) {
     })
 
   } catch (error) {
-    return res.json({ error })
+    return res.status(500).json({ success: false, error: error.message })
   }
 }
 
-async function updateReport(req,res){
-  try{
+async function updateReport(req, res) {
+  try {
     const { id } = req.params
+    const { title, content, street, district, city, lat, lng, catId } = req.body
 
-    const report =  await reportService.findReportById(id)
+    const report = await reportService.findReportById(id)
 
     if (!report) {
-      return res.json({
+      return res.status(404).json({
         success: false,
-        data: report,
-        message: "The update is not yet available",
+        message: "Could not find this report",
       })
-
     }
-  }catch(error){
-    return res.json({ error })
+
+    const updatedReport = await reportService.updateReport(
+      id, title, content, street, district, city, lat, lng, catId
+    )
+
+    return res.json({
+      success: true,
+      data: updatedReport,
+      message: "Report updated successfully",
+    })
+
+  } catch (error) {
+    return res.status(500).json({ success: false, error: error.message })
   }
 }
 
 async function deleteReport(req, res) {
   try {
     const { id } = req.params
-
     const report = await reportService.findReportById(id)
 
     if (!report) {
-      return res.json({
+      return res.status(404).json({
         success: false,
-        data: id,
         message: "Could not find this report",
       })
     }
@@ -94,12 +98,12 @@ async function deleteReport(req, res) {
     await reportService.deleteReportById(id)
     return res.json({
       success: true,
-      data: id,
+      data: { id },
       message: "Report deleted successfully",
     })
 
   } catch (error) {
-    return res.json({ error })
+    return res.status(500).json({ success: false, error: error.message })
   }
 }
 
@@ -109,5 +113,4 @@ module.exports = {
   findAllReports,
   updateReport,
   deleteReport
-
 }

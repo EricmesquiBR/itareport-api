@@ -17,7 +17,7 @@ async function findUserByEmail(email) {
 }
 
 async function findUserById(id) {
-    const user = prismaClient.usuario.findFirst({
+    const user = await prismaClient.usuario.findFirst({
         where: { id_user: id }
     })
 
@@ -29,10 +29,14 @@ async function findAllUsers() {
     return users
 }
 
-async function updateUser(id, name, email) {
+async function updateUser(id, name, email, password) {
+    const data = { name, email }
+    if (password) {
+        data.password = password
+    }
     const user = await prismaClient.usuario.update({
         where: { id_user: id },
-        data: { name, email }
+        data
     })
 
     return user

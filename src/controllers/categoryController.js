@@ -1,72 +1,65 @@
 const categoryService = require("../services/categoryService");
 
-
-async function createCategorys(req, res) {
+async function createCategory(req, res) {
     try {
-        const { id } = req.params
-        const { name} = req.body
+        const { name } = req.body
 
-        if (id == '7fbd96fd-130d-42ab-b0b8-de1d85311629'){
-
-            category = await categoryService.createCategory(name)
-
-            return res.json({
-                success: true,
-                data: category,
-                message: "Category created successfully"
-            })
-        }else{
-            return res.json({
-                message: "User does not have permission for this action"
+        if (!name) {
+            return res.status(400).json({
+                success: false,
+                message: "Category name is required"
             })
         }
-        
+
+        const category = await categoryService.createCategory(name)
+
+        return res.status(201).json({
+            success: true,
+            data: category,
+            message: "Category created successfully"
+        })
     } catch (error) {
-        return res.json({ error })
+        return res.status(500).json({ success: false, error: error.message })
     }
 }
 
-
-
-async function findReportByCategoryId(req,res){
-    try{
-      const { id } = req.params;
-  
-      const report =  await categoryService.findReportByCategory(id);
-  
-      if (!report) {
-        return res.json({
-          success: false,
-          data: report,
-          message: "Could not find reports in this category",
-        });
-      }
-  
-      return res.json({
-        success: true,
-        data: report,
-        message: "report of this category successfully found",
-      });
-    }catch(error){
-      return res.json({ error });
-    }
-  }
-  
-  async function findAllCategory(req, res) {
+async function findReportByCategoryId(req, res) {
     try {
-      const category = await categoryService.findAllCategory();
-      return res.json({
-        success: true,
-        data: category,
-        message: "Reports found successfully",
-      });
-    } catch (error) {
-      return res.json({ error });
-    }
-  }
+        const { id } = req.params;
+        const reports = await categoryService.findReportByCategory(id);
 
-  module.exports = {
-    createCategorys,
+        if (!reports || reports.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "Could not find reports in this category",
+            });
+        }
+
+        return res.json({
+            success: true,
+            data: reports,
+            message: "Reports of this category successfully found",
+        });
+    } catch (error) {
+        return res.status(500).json({ success: false, error: error.message });
+    }
+}
+
+async function findAllCategory(req, res) {
+    try {
+        const categories = await categoryService.findAllCategory();
+        return res.json({
+            success: true,
+            data: categories,
+            message: "Categories found successfully",
+        });
+    } catch (error) {
+        return res.status(500).json({ success: false, error: error.message });
+    }
+}
+
+module.exports = {
+    createCategory,
     findReportByCategoryId,
     findAllCategory
-  };
+};

@@ -19,11 +19,11 @@ async function createReport(titulo, conteudo, id, idCat, rua, bairro, cidade, la
 }
 
 async function findReportById(id) {
-  const repor = prismaClient.Denuncia.findFirst({
+  const report = await prismaClient.Denuncia.findFirst({
     where: { id_report: id },
   });
 
-  return repor;
+  return report;
 }
 
 async function findAllReport() {
@@ -31,8 +31,13 @@ async function findAllReport() {
   return reports;
 }
 
-async function updateReport() {
-  return null;
+async function updateReport(id, title, content, street, district, city, lat, lng, catId) {
+  const report = await prismaClient.Denuncia.update({
+    where: { id_report: id },
+    data: { title, content, street, district, city, lat, lng, catId },
+  });
+
+  return report;
 }
 
 async function deleteReportById(id) {
