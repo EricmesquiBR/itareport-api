@@ -1,7 +1,7 @@
 import { boolean, pgTable, real, text, varchar } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
-import { namedId } from "../utils/named-id.ts";
-import { timestamps } from "./columns.helpers.ts";
+import { namedId } from "../utils/named-id.js";
+import { timestamps } from "./columns.helpers.js";
 
 export const users = pgTable("users", {
   id: varchar("id", { length: 64 })

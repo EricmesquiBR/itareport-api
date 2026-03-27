@@ -1,8 +1,18 @@
-import { db } from "../db/index.ts";
-import { reports } from "../db/schema.ts";
+import { db } from "../db/index.js";
+import { reports } from "../db/schema.js";
 import { eq } from "drizzle-orm";
 
-export async function createReport(titulo, conteudo, idUser, idCat, rua, bairro, cidade, lat, lng) {
+export async function createReport(
+  titulo: any,
+  conteudo: any,
+  idUser: any,
+  idCat: any,
+  rua: any,
+  bairro: any,
+  cidade: any,
+  lat: any,
+  lng: any,
+) {
   const [report] = await db
     .insert(reports)
     .values({
@@ -21,7 +31,7 @@ export async function createReport(titulo, conteudo, idUser, idCat, rua, bairro,
   return report;
 }
 
-export async function findReportById(id) {
+export async function findReportById(id: any) {
   const report = await db.query.reports.findFirst({
     where: eq(reports.id, id),
   });
@@ -35,15 +45,15 @@ export async function findAllReport() {
 }
 
 export async function updateReport(
-  id,
-  title,
-  content,
-  street,
-  district,
-  city,
-  lat,
-  lng,
-  categoryId,
+  id: any,
+  title: any,
+  content: any,
+  street: any,
+  district: any,
+  city: any,
+  lat: any,
+  lng: any,
+  categoryId: any,
 ) {
   const [report] = await db
     .update(reports)
@@ -54,7 +64,7 @@ export async function updateReport(
   return report;
 }
 
-export async function deleteReportById(id) {
+export async function deleteReportById(id: any) {
   const [deletedReport] = await db.delete(reports).where(eq(reports.id, id)).returning();
   return deletedReport;
 }

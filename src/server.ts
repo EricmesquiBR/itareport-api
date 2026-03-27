@@ -3,7 +3,7 @@ import userRoutes from "./api/userRoute.js";
 import reportRoutes from "./api/reportRoute.js";
 import categoryRoute from "./api/categoryRoute.js";
 import cors from "cors";
-import { env } from "./env.ts";
+import { env } from "./env.js";
 
 const app = express();
 
@@ -14,10 +14,6 @@ app.use(userRoutes, reportRoutes, categoryRoute);
 const PORT = env.PORT;
 const HOST = env.HOST;
 
-const server = app.listen(PORT, HOST, (err) => {
-  if (err) {
-    console.log(err);
-    process.exit(1);
-  }
-  console.log(`Server is running on ${HOST}:${server.address().port}`);
+app.listen(PORT, HOST, () => {
+  console.log(`Server is running on ${HOST}:${PORT}`);
 });

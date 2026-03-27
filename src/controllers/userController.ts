@@ -1,6 +1,7 @@
 import * as userService from "../services/usuarioService.js";
+import type { Request, Response } from "express";
 
-export async function createUser(req, res) {
+export async function createUser(req: Request, res: Response) {
   try {
     const { name, cpf, email, password } = req.body;
     const existingUser = await userService.findUserByEmail(email);
@@ -14,22 +15,22 @@ export async function createUser(req, res) {
     }
 
     const usuario = await userService.createUser(name, cpf, email, password);
-    const { password: _, ...usuarioSemSenha } = usuario;
+    const { password: _, ...usuarioSemSenha } = usuario as any;
 
     return res.status(201).json({
       success: true,
       data: usuarioSemSenha,
       message: "User created successfully",
     });
-  } catch (error) {
+  } catch (error: any) {
     return res.status(500).json({ success: false, error: error.message });
   }
 }
 
-export async function checkUserCredentials(req, res) {
+export async function checkUserCredentials(req: Request, res: Response) {
   try {
     const { email, password } = req.body;
-    const usuario = await userService.findUserByEmail(email);
+    const usuario = (await userService.findUserByEmail(email)) as any;
 
     if (!usuario) {
       return res.status(404).json({
@@ -54,15 +55,15 @@ export async function checkUserCredentials(req, res) {
       data: usuarioSemSenha,
       message: "User logged in successfully",
     });
-  } catch (error) {
+  } catch (error: any) {
     return res.status(500).json({ success: false, error: error.message });
   }
 }
 
-export async function findAllUsers(req, res) {
+export async function findAllReports(_req: Request, res: Response) {
   try {
     const usuarios = await userService.findAllUsers();
-    const usuariosSemSenha = usuarios.map((user) => {
+    const usuariosSemSenha = usuarios.map((user: any) => {
       const { password: _, ...usuarioSemSenha } = user;
       return usuarioSemSenha;
     });
@@ -72,15 +73,15 @@ export async function findAllUsers(req, res) {
       data: usuariosSemSenha,
       message: "Users found successfully",
     });
-  } catch (error) {
+  } catch (error: any) {
     return res.status(500).json({ success: false, error: error.message });
   }
 }
 
-export async function findUser(req, res) {
+export async function findUser(req: Request, res: Response) {
   try {
     const { id } = req.params;
-    const usuario = await userService.findUserById(id);
+    const usuario = (await userService.findUserById(id)) as any;
 
     if (!usuario) {
       return res.status(404).json({
@@ -96,12 +97,12 @@ export async function findUser(req, res) {
       data: usuarioSemSenha,
       message: "User found successfully",
     });
-  } catch (error) {
+  } catch (error: any) {
     return res.status(500).json({ success: false, error: error.message });
   }
 }
 
-export async function updateUser(req, res) {
+export async function updateUser(req: Request, res: Response) {
   try {
     const { id } = req.params;
     const { name, email, password } = req.body;
@@ -116,7 +117,7 @@ export async function updateUser(req, res) {
       });
     }
 
-    const novoUsuario = await userService.updateUser(id, name, email, password);
+    const novoUsuario = (await userService.updateUser(id, name, email, password)) as any;
     const { password: _, ...usuarioSemSenha } = novoUsuario;
 
     return res.json({
@@ -124,12 +125,12 @@ export async function updateUser(req, res) {
       data: usuarioSemSenha,
       message: "User updated successfully",
     });
-  } catch (error) {
+  } catch (error: any) {
     return res.status(500).json({ success: false, error: error.message });
   }
 }
 
-export async function deleteUser(req, res) {
+export async function deleteUser(req: Request, res: Response) {
   try {
     const { id } = req.params;
 
@@ -148,7 +149,7 @@ export async function deleteUser(req, res) {
       data: { id },
       message: "User deleted successfully",
     });
-  } catch (error) {
+  } catch (error: any) {
     return res.status(500).json({ success: false, error: error.message });
   }
 }

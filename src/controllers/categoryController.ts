@@ -1,6 +1,7 @@
 import * as categoryService from "../services/categoryService.js";
+import type { Request, Response } from "express";
 
-export async function createCategory(req, res) {
+export async function createCategory(req: Request, res: Response) {
   try {
     const { name } = req.body;
 
@@ -18,12 +19,12 @@ export async function createCategory(req, res) {
       data: category,
       message: "Category created successfully",
     });
-  } catch (error) {
+  } catch (error: any) {
     return res.status(500).json({ success: false, error: error.message });
   }
 }
 
-export async function findReportByCategoryId(req, res) {
+export async function findReportByCategoryId(req: Request, res: Response) {
   try {
     const { id } = req.params;
     const reports = await categoryService.findReportByCategory(id);
@@ -40,12 +41,12 @@ export async function findReportByCategoryId(req, res) {
       data: reports,
       message: "Reports of this category successfully found",
     });
-  } catch (error) {
+  } catch (error: any) {
     return res.status(500).json({ success: false, error: error.message });
   }
 }
 
-export async function findAllCategory(req, res) {
+export async function findAllCategory(_req: Request, res: Response) {
   try {
     const categories = await categoryService.findAllCategory();
     return res.json({
@@ -53,7 +54,7 @@ export async function findAllCategory(req, res) {
       data: categories,
       message: "Categories found successfully",
     });
-  } catch (error) {
+  } catch (error: any) {
     return res.status(500).json({ success: false, error: error.message });
   }
 }

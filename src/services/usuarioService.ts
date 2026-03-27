@@ -1,14 +1,14 @@
-import { db } from "../db/index.ts";
-import { users } from "../db/schema.ts";
+import { db } from "../db/index.js";
+import { users } from "../db/schema.js";
 import { eq } from "drizzle-orm";
 
-export async function createUser(name, cpf, email, password) {
+export async function createUser(name: any, cpf: any, email: any, password: any) {
   const [usuario] = await db.insert(users).values({ name, cpf, email, password }).returning();
 
   return usuario;
 }
 
-export async function findUserByEmail(email) {
+export async function findUserByEmail(email: any) {
   const usuario = await db.query.users.findFirst({
     where: eq(users.email, email),
   });
@@ -16,7 +16,7 @@ export async function findUserByEmail(email) {
   return usuario;
 }
 
-export async function findUserById(id) {
+export async function findUserById(id: any) {
   const user = await db.query.users.findFirst({
     where: eq(users.id, id),
   });
@@ -29,17 +29,17 @@ export async function findAllUsers() {
   return usersList;
 }
 
-export async function updateUser(id, name, email, password) {
-  const data = { name, email };
-  if (password) {
-    data.password = password;
-  }
-  const [user] = await db.update(users).set(data).where(eq(users.id, id)).returning();
+export async function updateUser(id: any, name: any, email: any, password?: any) {
+  const [user] = await db
+    .update(users)
+    .set({ name, email, ...(password ? { password } : {}) })
+    .where(eq(users.id, id))
+    .returning();
 
   return user;
 }
 
-export async function deleteUserById(id) {
+export async function deleteUserById(id: any) {
   const [deletedUser] = await db.delete(users).where(eq(users.id, id)).returning();
   return deletedUser;
 }
