@@ -4,30 +4,40 @@ REST API backend for [Itareport](../itareport) — a community-driven platform f
 
 ## Tech Stack
 
-- [Node.js](https://nodejs.org/) with [Express](https://expressjs.com/)
-- [Prisma](https://www.prisma.io/) ORM
-- [PostgreSQL](https://www.postgresql.org/)
-- JavaScript
+- **Runtime**: [Node.js](https://nodejs.org/) (v24+)
+- **Framework**: [Hono](https://hono.dev/) with [@hono/node-server](https://github.com/honojs/node-server)
+- **ORM**: [Drizzle ORM](https://orm.drizzle.team/)
+- **Database**: [PostgreSQL](https://www.postgresql.org/)
+- **Validation**: [Zod](https://zod.dev/)
+- **Logging**: [Pino](https://getpino.io/)
+- **Build Tool**: [tsdown](https://github.com/egoist/tsdown)
+- **Formatting & Linting**: [oxlint](https://oxc-project.github.io/docs/guide/usage/linter/oxlint.html) & [oxfmt](https://oxc-project.github.io/docs/guide/usage/formatter/oxfmt.html)
 
 ## Prerequisites
 
-- [Node.js](https://nodejs.org/) >= 16
-- [npm](https://www.npmjs.com/)
-- [PostgreSQL](https://www.postgresql.org/) database running locally or remotely
+- [Node.js](https://nodejs.org/) >= 24 (Recommended to use [mise](https://mise.jdx.dev/) or [nvm](https://github.com/nvm-sh/nvm) for versioning)
+- [pnpm](https://pnpm.io/) (Recommended to use mise)
+- [PostgreSQL](https://www.postgresql.org/) & [Redis](https://redis.io/) (via [Docker](https://www.docker.com/))
+- [GitHub CLI](https://cli.github.com/) (recommended)
 
 ## Getting Started
 
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/<your-org>/itareport-api.git
+   # Using GitHub CLI (recommended)
+   gh repo clone EricmesquiBR/itareport-api
+
+   # Or using Git
+   git clone https://github.com/EricmesquiBR/itareport-api.git
+
    cd itareport-api
    ```
 
 2. **Install dependencies**
 
    ```bash
-   npm install
+   pnpm install
    ```
 
 3. **Configure environment variables**
@@ -41,88 +51,98 @@ REST API backend for [Itareport](../itareport) — a community-driven platform f
    Edit `.env`:
 
    ```env
-   DATABASE_URL=postgres://user:password@localhost:5432/itareport?schema=public
+   HOST=0.0.0.0
+   PORT=3000
+   POSTGRES_HOST=localhost
+   POSTGRES_USER=postgres
+   POSTGRES_PASSWORD=your_password
+   POSTGRES_DB=itareport
+   POSTGRES_PORT=5432
    ```
 
-4. **Run database migrations**
+4. **Start the database (via Docker)**
+
+   The project uses Docker Compose to run PostgreSQL and Redis:
 
    ```bash
-   npx prisma migrate dev
+   docker compose -f infra/compose.yaml up -d
    ```
 
-5. **Start the development server**
+5. **Database Setup**
+
+   Generate and push the schema to the database:
 
    ```bash
-   npm run dev
+   pnpm run db:generate
+   pnpm run db:migrate
    ```
 
-   The API will be available at [http://localhost:3030](http://localhost:3030).
+6. **Start the development server**
 
-## API Endpoints
+   ```bash
+   pnpm run dev
+   ```
 
-### Users
+   The API will be available at [http://localhost:3000/v1](http://localhost:3000/v1).
 
-| Method | Endpoint    | Description       |
-| ------ | ----------- | ----------------- |
-| GET    | `/users`    | List all users    |
-| GET    | `/user/:id` | Get user by ID    |
-| POST   | `/user`     | Create a new user |
-| PUT    | `/user/:id` | Update a user     |
-| DELETE | `/user/:id` | Delete a user     |
+## Available Scripts
 
-### Reports (Denuncias)
-
-| Method | Endpoint      | Description         |
-| ------ | ------------- | ------------------- |
-| GET    | `/reports`    | List all reports    |
-| GET    | `/report/:id` | Get report by ID    |
-| POST   | `/report`     | Create a new report |
-| PUT    | `/report/:id` | Update a report     |
-| DELETE | `/report/:id` | Delete a report     |
-
-### Categories
-
-| Method | Endpoint        | Description           |
-| ------ | --------------- | --------------------- |
-| GET    | `/category`     | List all categories   |
-| GET    | `/category/:id` | Get category by ID    |
-| POST   | `/category/:id` | Create a new category |
-
-## Database Schema
-
-The API uses three main models managed by Prisma:
-
-- **Usuario** — User accounts (email, name, CPF, password)
-- **Denuncia** — Reports with geolocation, category, and content
-- **Categoria** — Report categories
-
-See [`prisma/schema.prisma`](prisma/schema.prisma) for the full schema definition.
+- `pnpm run dev`: Start the development server with `tsx watch`.
+- `pnpm run build`: Build the project using `tsdown`.
+- `pnpm run start`: Run the built project.
+- `pnpm run type-check`: Run TypeScript type checking.
+- `pnpm run db:generate`: Generate Drizzle migrations.
+- `pnpm run db:migrate`: Run Drizzle migrations.
+- `pnpm run db:push`: Push the schema changes directly to the database.
+- `pnpm run db:studio`: Open Drizzle Studio to explore the database.
+- `pnpm run lint`: Run `oxlint` for linting.
+- `pnpm run fmt`: Run `oxfmt` for formatting.
 
 ## Project Structure
 
-```
+```text
 src/
-  api/            # Route definitions
-  config/         # Server configuration
-  controllers/    # Request handlers
-  db/             # Database client setup
-  middleware/     # Express middleware
-  models/         # Data models
-  services/       # Business logic
-  server.js       # App entry point
-prisma/
-  schema.prisma   # Database schema
-  migrations/     # Migration history
+├── db/             # Drizzle configuration and schema
+├── features/       # Feature-based capsules
+│   ├── categories/ # Category routes, service, and schema
+│   ├── reports/    # Report routes, service, and schema
+│   └── users/      # User routes, service, and schema
+├── lib/            # Shared libraries (logger, etc.)
+├── utils/          # Utility functions
+├── env.ts          # Environment variable validation (Zod)
+└── server.ts       # Application entry point and middleware
 ```
 
-## Related
+## API Reference (v1)
 
-- [itareport](../itareport) — Frontend application for this project
+### Users
 
-## Contributing
+| Method | Endpoint          | Description                    |
+| ------ | ----------------- | ------------------------------ |
+| POST   | `/v1/users`       | Create a new user              |
+| POST   | `/v1/users/login` | User login (returns user data) |
+| GET    | `/v1/users/:id`   | Get user by ID                 |
+| PUT    | `/v1/users/:id`   | Update a user                  |
+| DELETE | `/v1/users/:id`   | Delete a user                  |
 
-Contributions are welcome! Feel free to open issues or submit pull requests.
+### Reports
+
+| Method | Endpoint          | Description         |
+| ------ | ----------------- | ------------------- |
+| GET    | `/v1/reports`     | List all reports    |
+| GET    | `/v1/reports/:id` | Get report by ID    |
+| POST   | `/v1/reports`     | Create a new report |
+| PUT    | `/v1/reports/:id` | Update a report     |
+| DELETE | `/v1/reports/:id` | Delete a report     |
+
+### Categories
+
+| Method | Endpoint                     | Description              |
+| ------ | ---------------------------- | ------------------------ |
+| GET    | `/v1/categories`             | List all categories      |
+| POST   | `/v1/categories`             | Create a new category    |
+| GET    | `/v1/categories/:id/reports` | List reports by category |
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
+This project is licensed under the [GNU General Public License v3.0](LICENSE).
