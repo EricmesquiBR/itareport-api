@@ -21,21 +21,17 @@ export async function createUser(input: CreateUserInput) {
 }
 
 export async function findUserByEmail(email: string) {
-  const user = await db.query.users.findFirst({
-    where: eq(users.email, email),
-  });
+  const [user] = await db.select().from(users).where(eq(users.email, email)).limit(1);
   return user;
 }
 
 export async function findUserById(id: string) {
-  const user = await db.query.users.findFirst({
-    where: eq(users.id, id),
-  });
+  const [user] = await db.select().from(users).where(eq(users.id, id)).limit(1);
   return user;
 }
 
 export async function findAllUsers() {
-  const usersList = await db.query.users.findMany();
+  const usersList = await db.select().from(users);
   return usersList;
 }
 

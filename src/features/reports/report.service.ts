@@ -31,14 +31,12 @@ export async function createReport(input: CreateReportInput) {
 }
 
 export async function findReportById(id: string) {
-  const report = await db.query.reports.findFirst({
-    where: eq(reports.id, id),
-  });
+  const [report] = await db.select().from(reports).where(eq(reports.id, id)).limit(1);
   return report;
 }
 
 export async function findAllReports() {
-  const reportsList = await db.query.reports.findMany();
+  const reportsList = await db.select().from(reports);
   return reportsList;
 }
 

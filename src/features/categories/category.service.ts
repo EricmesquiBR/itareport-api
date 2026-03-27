@@ -8,13 +8,11 @@ export async function createCategory(name: string) {
 }
 
 export async function findReportsByCategory(categoryId: string) {
-  const reportsList = await db.query.reports.findMany({
-    where: eq(reports.categoryId, categoryId),
-  });
+  const reportsList = await db.select().from(reports).where(eq(reports.categoryId, categoryId));
   return reportsList;
 }
 
 export async function findAllCategories() {
-  const categoriesList = await db.query.categories.findMany();
+  const categoriesList = await db.select().from(categories);
   return categoriesList;
 }
