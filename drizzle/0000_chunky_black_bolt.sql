@@ -1,10 +1,10 @@
 CREATE TABLE "categories" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"id" varchar(64) PRIMARY KEY NOT NULL,
 	"name" varchar(50) NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "reports" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"id" varchar(64) PRIMARY KEY NOT NULL,
 	"title" varchar(255) NOT NULL,
 	"content" text NOT NULL,
 	"street" varchar(100) NOT NULL,
@@ -13,19 +13,22 @@ CREATE TABLE "reports" (
 	"lat" real NOT NULL,
 	"lng" real NOT NULL,
 	"validated" boolean DEFAULT false NOT NULL,
-	"user_id" uuid NOT NULL,
-	"category_id" uuid NOT NULL,
+	"user_id" varchar(64) NOT NULL,
+	"category_id" varchar(64) NOT NULL,
+	"updated_at" timestamp NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
-	"updated_at" timestamp DEFAULT now() NOT NULL
+	"deleted_at" timestamp
 );
 --> statement-breakpoint
 CREATE TABLE "users" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"name" varchar NOT NULL,
+	"id" varchar(64) PRIMARY KEY NOT NULL,
+	"name" varchar(255) NOT NULL,
 	"cpf" varchar(15) NOT NULL,
-	"email" varchar NOT NULL,
-	"password" varchar NOT NULL,
+	"email" varchar(255) NOT NULL,
+	"password" varchar(255) NOT NULL,
+	"updated_at" timestamp NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
+	"deleted_at" timestamp,
 	CONSTRAINT "users_email_unique" UNIQUE("email")
 );
 --> statement-breakpoint

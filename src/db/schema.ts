@@ -1,6 +1,7 @@
-import { boolean, pgTable, real, text, timestamp, varchar } from "drizzle-orm/pg-core";
+import { boolean, pgTable, real, text, varchar } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
-import { namedId } from "../utills/named-id.ts";
+import { namedId } from "../utils/named-id.ts";
+import { timestamps } from "./columns.helpers.ts";
 
 export const users = pgTable("users", {
   id: varchar("id", { length: 64 })
@@ -10,7 +11,7 @@ export const users = pgTable("users", {
   cpf: varchar("cpf", { length: 15 }).notNull(),
   email: varchar("email", { length: 255 }).unique().notNull(),
   password: varchar("password", { length: 255 }).notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
+  ...timestamps,
 });
 
 export const categories = pgTable("categories", {
@@ -38,11 +39,7 @@ export const reports = pgTable("reports", {
   categoryId: varchar("category_id", { length: 64 })
     .references(() => categories.id)
     .notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at")
-    .defaultNow()
-    .notNull()
-    .$onUpdate(() => new Date()),
+  ...timestamps,
 });
 
 export const usersRelations = relations(users, ({ many }) => ({
