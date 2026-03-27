@@ -1,22 +1,20 @@
-import { db } from "../db/index.js";
-import { categories, reports } from "../db/schema.js";
 import { eq } from "drizzle-orm";
+import { db } from "../../db/index.js";
+import { categories, reports } from "../../db/schema.js";
 
-export async function createCategory(name: any) {
+export async function createCategory(name: string) {
   const [category] = await db.insert(categories).values({ name }).returning();
-
   return category;
 }
 
-export async function findReportByCategory(id: any) {
+export async function findReportsByCategory(categoryId: string) {
   const reportsList = await db.query.reports.findMany({
-    where: eq(reports.categoryId, id),
+    where: eq(reports.categoryId, categoryId),
   });
-
   return reportsList;
 }
 
-export async function findAllCategory() {
+export async function findAllCategories() {
   const categoriesList = await db.query.categories.findMany();
   return categoriesList;
 }
