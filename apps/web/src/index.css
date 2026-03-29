@@ -1,0 +1,168 @@
+@import "tailwindcss";
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+  --headerBackgroundColor: #f5f5f5;
+  --lightGray: #cccccc;
+  --lightBlue: #167faf;
+  --darkBlue: #064663;
+  --deepBlue: #042331;
+  --white: #ffffff;
+  --containerPadding: calc((100vw - 960px) / 2);
+  --headerHeight: 80px;
+  --headerCondensedHeight: 50px;
+}
+
+body {
+  font-family: "Roboto", sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  margin: 0;
+  padding: 0;
+}
+
+/* Map */
+.leaflet-container {
+  height: 90vh;
+  width: calc(100vw - 100px);
+  z-index: 1;
+}
+
+.leaflet-popup-content-wrapper {
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 20px;
+  box-shadow: none;
+}
+
+.leaflet-popup-content h3 {
+  color: #0089a5;
+  font-size: 20px;
+  font-weight: bold;
+  margin: 8px 12px;
+}
+
+.leaflet-popup-content p {
+  color: #042f38;
+  font-size: 12px;
+  font-weight: bold;
+  margin: 8px 12px;
+  line-height: 15px;
+}
+
+.leaflet-popup-tip-container {
+  display: none;
+}
+
+.loading {
+  height: 90vh;
+  width: 100vw;
+  font-size: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bolder;
+}
+
+/* Forms */
+.form-login {
+  width: 80vh;
+}
+
+.form-register {
+  width: 90vh;
+}
+
+/* Footer */
+footer {
+  color: var(--white);
+}
+
+.footerInfo {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: flex-start;
+  align-content: center;
+  justify-content: space-between;
+  padding-left: var(--containerPadding);
+  padding-right: var(--containerPadding);
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.footerInfo h4 {
+  color: var(--lightBlue);
+}
+
+.footerInfo a {
+  color: var(--white);
+}
+
+.footerInfo a:hover {
+  color: var(--lightBlue);
+}
+
+.footerInfo div {
+  width: calc(100% / 3);
+  padding-left: 50px;
+}
+
+.footerInfo div:first-of-type {
+  padding-left: 0;
+}
+
+@media all and (max-width: 960px) {
+  .footerInfo {
+    flex-flow: column nowrap;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  .footerInfo div {
+    width: 100%;
+    padding-left: 0;
+  }
+}
+
+.footerInfo ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.footerInfo i {
+  font-size: 20px;
+  margin-right: 20px;
+}
+
+@media all and (max-width: 960px) {
+  .footerInfo ul li {
+    display: inline-block;
+    padding-right: 20px;
+    margin-bottom: 10px;
+  }
+}
+
+.copyright {
+  width: 100%;
+  height: 50px;
+  color: var(--white);
+  background-color: var(--deepBlue);
+  text-align: center;
+  font-size: 14px;
+  line-height: 50px;
+}
+
+/* Landing page */
+.cta-img {
+  min-height: 700px;
+  max-height: 700px;
+  min-width: 90%;
+  max-width: 90%;
+  border: solid black 2px;
+}
+
+.cta-bottom:hover {
+  transition: 0.5s;
+  font-size: 2rem;
+}
