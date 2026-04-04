@@ -18,7 +18,7 @@ export default function Header() {
         <Link to="/">ItaReport</Link>
       </div>
       <nav className="space-x-5">
-        {userId === null || userId === "" ? (
+        {!userId ? (
           <>
             <Link to="/login" className="text-white">
               Login

@@ -19,6 +19,8 @@ const envShape = z.object({
     .default("info")
     .optional(),
   CORS_ORIGIN: z.string().default("*"),
+  JWT_SECRET: z.string().min(32, "JWT_SECRET must be at least 32 characters"),
+  JWT_EXPIRES_IN: z.string().default("7d"),
 });
 
 const safeEnv = envShape.safeParse(process.env);

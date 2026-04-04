@@ -25,6 +25,7 @@
     "drizzle-orm": "^0.45.1",
     "hono": "^4.12.10",
     "hono-rate-limiter": "^0.5.3",
+    "jose": "^6.2.2",
     "nanoid": "^5.1.7",
     "pino": "^10.3.1",
     "postgres": "^3.4.8",

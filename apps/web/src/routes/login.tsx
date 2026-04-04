@@ -13,7 +13,7 @@ export const Route = createFileRoute("/login")({
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { setUserId } = useGlobalContext();
+  const { setUserId, setToken } = useGlobalContext();
   const navigate = useNavigate();
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
@@ -26,7 +26,8 @@ function Login() {
           alert(response.data.message);
           return;
         }
-        setUserId(response.data.data.id);
+        setUserId(response.data.data.user.id);
+        setToken(response.data.data.token);
         alert(response.data.message);
         navigate({ to: "/" });
       })

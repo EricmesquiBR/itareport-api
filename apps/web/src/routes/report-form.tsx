@@ -25,7 +25,7 @@ function ReportForm() {
   const [street, setStreet] = useState("");
   const [district, setDistrict] = useState("");
   const [city, setCity] = useState("");
-  const { markerData, userId } = useGlobalContext();
+  const { markerData } = useGlobalContext();
   const [categories, setCategories] = useState<Category[]>([]);
   const navigate = useNavigate();
 
@@ -52,7 +52,6 @@ function ReportForm() {
       .post("/reports", {
         title,
         content,
-        id: userId,
         idCat,
         street,
         district,
@@ -61,10 +60,11 @@ function ReportForm() {
         lng: markerData[1],
       })
       .then((response) => {
-        if (response.data) {
+        if (response.data.success) {
           alert(response.data.message);
-          if (response.data.error) return;
           navigate({ to: "/map" });
+        } else {
+          alert(response.data.message);
         }
       })
       .catch(() => {

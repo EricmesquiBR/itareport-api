@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
+import { generateToken, authMiddleware, getAuthUserId } from "../../middleware/auth.js";
 import bcrypt from "bcryptjs";
 import * as userService from "./user.service.js";
 import { createUserSchema, loginSchema, updateUserSchema } from "./user.schema.js";
@@ -48,13 +49,15 @@ export const userRoutes = new Hono()
       return c.json({ success: false, data: { email }, message: "Incorrect password" }, 401);
     }
 
+    const token = await generateToken(user.id);
+
     return c.json({
       success: true,
-      data: omitPassword(user),
+      data: { user: omitPassword(user), token },
       message: "User logged in successfully",
     });
   })
-  .get("/:id", async (c) => {
+  .get("/:id", authMiddleware(), async (c) => {
     const { id } = c.req.param();
     const user = await userService.findUserById(id);
 
@@ -68,9 +71,14 @@ export const userRoutes = new Hono()
       message: "User found successfully",
     });
   })
-  .put("/:id", zValidator("json", updateUserSchema), async (c) => {
+  .put("/:id", authMiddleware(), zValidator("json", updateUserSchema), async (c) => {
     const { id } = c.req.param();
     const body = c.req.valid("json");
+    const authUserId = getAuthUserId(c);
+
+    if (id !== authUserId) {
+      return c.json({ success: false, message: "Forbidden" }, 403);
+    }
 
     const existing = await userService.findUserById(id);
     if (!existing) {
@@ -90,8 +98,13 @@ export const userRoutes = new Hono()
       message: "User updated successfully",
     });
   })
-  .delete("/:id", async (c) => {
+  .delete("/:id", authMiddleware(), async (c) => {
     const { id } = c.req.param();
+    const authUserId = getAuthUserId(c);
+
+    if (id !== authUserId) {
+      return c.json({ success: false, message: "Forbidden" }, 403);
+    }
 
     const existing = await userService.findUserById(id);
     if (!existing) {
