@@ -15,7 +15,7 @@ export const reportRoutes = new Hono()
         title: body.title,
         content: body.content,
         userId,
-        categoryId: body.idCat,
+        categoryId: body.categoryId,
         street: body.street,
         district: body.district,
         city: body.city,
@@ -112,7 +112,7 @@ export const reportRoutes = new Hono()
         city: body.city,
         lat: body.lat,
         lng: body.lng,
-        categoryId: body.catId,
+        categoryId: body.categoryId,
       });
 
       if (!updatedReport) {

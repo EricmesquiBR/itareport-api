@@ -3,7 +3,7 @@ import { z } from "zod";
 export const createReportSchema = z.object({
   title: z.string().min(1, "Title is required").max(255),
   content: z.string().min(1, "Content is required"),
-  idCat: z.string().min(1, "Category ID is required"),
+  categoryId: z.string().min(1, "Category ID is required"),
   street: z.string().min(1, "Street is required").max(100),
   district: z.string().min(1, "District is required").max(20),
   city: z.string().min(1, "City is required").max(30),
@@ -19,5 +19,5 @@ export const updateReportSchema = z.object({
   city: z.string().min(1).max(30).optional(),
   lat: z.number().optional(),
   lng: z.number().optional(),
-  catId: z.string().min(1).optional(),
+  categoryId: z.string().min(1).optional(),
 });

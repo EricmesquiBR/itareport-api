@@ -15,7 +15,7 @@ export const Route = createFileRoute("/report-form")({
 function ReportForm() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [idCat, setIdCat] = useState("");
+  const [categoryId, setCategoryId] = useState("");
   const [street, setStreet] = useState("");
   const [district, setDistrict] = useState("");
   const [city, setCity] = useState("");
@@ -35,7 +35,7 @@ function ReportForm() {
       return;
     }
 
-    if (!title || !content || !street || !district || !idCat || !city) {
+    if (!title || !content || !street || !district || !categoryId || !city) {
       alert("Fill in all fields");
       return;
     }
@@ -43,7 +43,7 @@ function ReportForm() {
     createReport({
       title,
       content,
-      idCat,
+      categoryId,
       street,
       district,
       city,
@@ -117,8 +117,8 @@ function ReportForm() {
                 <select
                   id="category"
                   className="border w-full text-base px-2 py-1 focus:outline-none focus:ring-0 focus:border-gray-600"
-                  value={idCat}
-                  onChange={(e) => setIdCat(e.target.value)}
+                  value={categoryId}
+                  onChange={(e) => setCategoryId(e.target.value)}
                 >
                   <option value="">Select a category</option>
                   {categories.map((category) => (

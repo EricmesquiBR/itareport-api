@@ -24,7 +24,7 @@ export type PaginationResult<T> = {
 export async function createReport(data: {
   title: string;
   content: string;
-  idCat: string;
+  categoryId: string;
   street: string;
   district: string;
   city: string;

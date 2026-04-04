@@ -24,7 +24,7 @@ type Report = {
 
 export default function IssueMap() {
   const [markersData, setMarkersData] = useState<Report[] | null>([]);
-  const [idCat, setIdCat] = useState("");
+  const [categoryId, setCategoryId] = useState("");
   const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
 
   useEffect(() => {
@@ -35,9 +35,9 @@ export default function IssueMap() {
     const fetchReports = async () => {
       try {
         const result =
-          idCat === ""
+          categoryId === ""
             ? await getReports(1000)
-            : await getReportsByCategory(idCat);
+            : await getReportsByCategory(categoryId);
 
         setMarkersData(Array.isArray(result) ? result : result.data);
       } catch (error) {
@@ -47,7 +47,7 @@ export default function IssueMap() {
     };
 
     fetchReports();
-  }, [idCat]);
+  }, [categoryId]);
 
   return (
     <>
@@ -58,8 +58,8 @@ export default function IssueMap() {
         <select
           id="category"
           className="flex border w-full text-base px-2 py-1 focus:outline-none focus:ring-0 focus:border-gray-600"
-          value={idCat}
-          onChange={(e) => setIdCat(e.target.value)}
+          value={categoryId}
+          onChange={(e) => setCategoryId(e.target.value)}
         >
           <option value="">All categories</option>
           {categories.map((category) => (
