@@ -44,11 +44,14 @@ if (env.NODE_ENV === "development") {
 /**
  * CORS Middleware
  */
+const isWildcardOrigin = env.CORS_ORIGIN === "*";
 app.use(
   "*",
   cors({
-    origin: env.CORS_ORIGIN === "*" ? "*" : env.CORS_ORIGIN.split(",").map((o) => o.trim()),
-    credentials: true,
+    origin: isWildcardOrigin
+      ? "*"
+      : env.CORS_ORIGIN.split(",").map((o) => o.trim()),
+    credentials: !isWildcardOrigin,
     maxAge: 604800, // 7 days
     allowHeaders: ["Content-Type", "Authorization"],
     allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
