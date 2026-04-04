@@ -21,45 +21,52 @@ function ReportForm() {
   const [city, setCity] = useState("");
   const { markerData } = useGlobalContext();
   const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
     getCategories().then(setCategories);
   }, []);
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setError("");
 
     if (typeof markerData[0] !== "number" || typeof markerData[1] !== "number") {
-      alert("Select a location on the map");
+      setError("Select a location on the map");
       return;
     }
 
     if (!title || !content || !street || !district || !categoryId || !city) {
-      alert("Fill in all fields");
+      setError("Fill in all fields");
       return;
     }
 
-    createReport({
-      title,
-      content,
-      categoryId,
-      street,
-      district,
-      city,
-      lat: markerData[0],
-      lng: markerData[1],
-    })
-      .then((response) => {
-        if (response.success) {
-          navigate({ to: "/map" });
-        } else {
-          alert(response.message);
-        }
-      })
-      .catch((error) => {
-        alert(error.response?.data?.message ?? "Error while submitting report");
+    setLoading(true);
+
+    try {
+      const response = await createReport({
+        title,
+        content,
+        categoryId,
+        street,
+        district,
+        city,
+        lat: markerData[0],
+        lng: markerData[1],
       });
+      if (response.success) {
+        navigate({ to: "/map" });
+      } else {
+        setError(response.message);
+      }
+    } catch (err: unknown) {
+      const axiosError = err as { response?: { data?: { message?: string } } };
+      setError(axiosError.response?.data?.message ?? "Error while submitting report");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -70,6 +77,11 @@ function ReportForm() {
               Issue Report Form
             </h1>
             <hr className="mt-3 col-span-2" />
+            {error && (
+              <div className="mt-3 col-span-2 p-2 bg-red-100 border border-red-400 text-red-700 rounded text-sm">
+                {error}
+              </div>
+            )}
             <div className="mt-3 col-span-2">
               <label htmlFor="title" className="block text-base mb-2">
                 Title
@@ -163,9 +175,10 @@ function ReportForm() {
             <div className="mt-5 col-span-2">
               <button
                 type="submit"
-                className="border-2 border-gray-900 bg-gray-900 text-white py-1 w-full rounded-md hover:bg-transparent hover:text-gray-900 font-semibold"
+                disabled={loading}
+                className="border-2 border-gray-900 bg-gray-900 text-white py-1 w-full rounded-md hover:bg-transparent hover:text-gray-900 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Submit
+                {loading ? "Submitting..." : "Submit"}
               </button>
             </div>
           </div>

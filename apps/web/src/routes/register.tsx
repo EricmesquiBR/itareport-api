@@ -14,43 +14,52 @@ function Register() {
   const [password, setPassword] = useState("");
   const [surPassword, setSurPassword] = useState("");
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setError("");
+    setSuccess("");
 
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!emailRegex.test(email)) {
-      alert("Invalid email");
+      setError("Invalid email");
       return;
     }
 
     if (password !== surPassword) {
-      alert("Passwords do not match");
+      setError("Passwords do not match");
       return;
     }
 
     if (!agreedToTerms) {
-      alert("You must agree to the terms of use and privacy policy");
+      setError("You must agree to the terms of use and privacy policy");
       return;
     }
 
-    createUser({ name, cpf, email, password })
-      .then((response) => {
-        if (!response.success) {
-          alert(response.message);
-          return;
-        }
-        alert("User registered successfully");
-      })
-      .catch((error) => {
-        alert(error.response?.data?.message ?? "Error while registering user");
-      });
+    setLoading(true);
 
-    setName("");
-    setEmail("");
-    setCPF("");
-    setPassword("");
-    setSurPassword("");
+    try {
+      const response = await createUser({ name, cpf, email, password });
+      if (!response.success) {
+        setError(response.message);
+        return;
+      }
+      setSuccess("User registered successfully");
+      setName("");
+      setEmail("");
+      setCPF("");
+      setPassword("");
+      setSurPassword("");
+      setAgreedToTerms(false);
+    } catch (err: unknown) {
+      const axiosError = err as { response?: { data?: { message?: string } } };
+      setError(axiosError.response?.data?.message ?? "Error while registering user");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -59,6 +68,16 @@ function Register() {
         <div className="htmlForm-register grid grid-cols-2 gap-3 p-6 shadow-lg bg-slate-50 rounded-md">
           <h1 className="text-3xl block text-center font-semibold col-span-2">Sign Up</h1>
           <hr className="mt-3 col-span-2" />
+          {error && (
+            <div className="mt-3 col-span-2 p-2 bg-red-100 border border-red-400 text-red-700 rounded text-sm">
+              {error}
+            </div>
+          )}
+          {success && (
+            <div className="mt-3 col-span-2 p-2 bg-green-100 border border-green-400 text-green-700 rounded text-sm">
+              {success}
+            </div>
+          )}
           <div className="mt-3 col-span-2">
             <label htmlFor="name" className="block text-base mb-2">
               Full name
@@ -135,9 +154,10 @@ function Register() {
           <div className="mt-5 col-span-2">
             <button
               type="submit"
-              className="border-2 border-gray-900 bg-gray-900 text-white py-1 w-full rounded-md hover:bg-transparent hover:text-gray-900 font-semibold"
+              disabled={loading}
+              className="border-2 border-gray-900 bg-gray-900 text-white py-1 w-full rounded-md hover:bg-transparent hover:text-gray-900 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Create account
+              {loading ? "Creating account..." : "Create account"}
             </button>
           </div>
         </div>

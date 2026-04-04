@@ -11,21 +11,27 @@ export const Route = createFileRoute("/login")({
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const { setUserId, setToken } = useGlobalContext();
   const navigate = useNavigate();
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setError("");
+    setLoading(true);
 
-    login(email, password)
-      .then((data) => {
-        setUserId(data.user.id);
-        setToken(data.token);
-        navigate({ to: "/" });
-      })
-      .catch((error) => {
-        alert(error.response?.data?.message ?? "Error while logging in");
-      });
+    try {
+      const data = await login(email, password);
+      setUserId(data.user.id);
+      setToken(data.token);
+      navigate({ to: "/" });
+    } catch (err: unknown) {
+      const axiosError = err as { response?: { data?: { message?: string } } };
+      setError(axiosError.response?.data?.message ?? "Error while logging in");
+    } finally {
+      setLoading(false);
+    }
 
     setEmail("");
     setPassword("");
@@ -36,6 +42,11 @@ function Login() {
       <form className="form-login p-6 shadow-lg bg-slate-50 rounded-md" onSubmit={handleSubmit}>
         <h1 className="text-3xl block text-center font-semibold">Login</h1>
         <hr className="mt-3" />
+        {error && (
+          <div className="mt-3 p-2 bg-red-100 border border-red-400 text-red-700 rounded text-sm">
+            {error}
+          </div>
+        )}
         <div className="mt-3">
           <label htmlFor="email" className="block text-base mb-2">
             Email
@@ -69,9 +80,10 @@ function Login() {
         <div className="mt-5">
           <button
             type="submit"
-            className="border-2 border-gray-900 bg-gray-900 text-white py-1 w-full rounded-md hover:bg-transparent hover:text-gray-900 font-semibold"
+            disabled={loading}
+            className="border-2 border-gray-900 bg-gray-900 text-white py-1 w-full rounded-md hover:bg-transparent hover:text-gray-900 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Login
+            {loading ? "Logging in..." : "Login"}
           </button>
         </div>
       </form>
