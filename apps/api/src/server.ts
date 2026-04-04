@@ -1,7 +1,6 @@
 import { Hono } from "hono";
 import { serve } from "@hono/node-server";
 import { cors } from "hono/cors";
-import { csrf } from "hono/csrf";
 import { prettyJSON } from "hono/pretty-json";
 import { getConnInfo } from "@hono/node-server/conninfo";
 import { rateLimiter } from "hono-rate-limiter";
@@ -36,9 +35,11 @@ app.use("*", async (c, next) => {
 
 /**
  * Pretty JSON middleware enables "JSON pretty print" for JSON response body.
- * Adding `?pretty` to url query param, the JSON strings are prettified.
+ * Only enabled in development.
  */
-app.use("*", prettyJSON());
+if (env.NODE_ENV === "development") {
+  app.use("*", prettyJSON());
+}
 
 /**
  * CORS Middleware
@@ -68,11 +69,6 @@ app.use(
     message: { success: false, message: "Too many requests, please try again later." },
   }),
 );
-
-/**
- * CSRF Protection Middleware prevents CSRF attacks.
- */
-app.use("*", csrf());
 
 // API v1
 const v1 = new Hono();
