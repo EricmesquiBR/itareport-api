@@ -13,6 +13,7 @@ function Register() {
   const [cpf, setCPF] = useState("");
   const [password, setPassword] = useState("");
   const [surPassword, setSurPassword] = useState("");
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -25,6 +26,11 @@ function Register() {
 
     if (password !== surPassword) {
       alert("Passwords do not match");
+      return;
+    }
+
+    if (!agreedToTerms) {
+      alert("You must agree to the terms of use and privacy policy");
       return;
     }
 
@@ -120,7 +126,7 @@ function Register() {
           </div>
           <div className="mt-3 flex justify-between items-center col-span-2">
             <div>
-              <input type="checkbox" />
+              <input type="checkbox" checked={agreedToTerms} onChange={(e) => setAgreedToTerms(e.target.checked)} />
               <label className="ps-1">
                 I agree to the website terms of use and privacy policy.
               </label>
