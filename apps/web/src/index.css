@@ -67,11 +67,18 @@ body {
 
 /* Forms */
 .form-login {
-  width: 80vh;
+  width: 100%;
+  max-width: 480px;
 }
 
 .form-register {
-  width: 90vh;
+  width: 100%;
+  max-width: 640px;
+}
+
+.form-register {
+  width: 100%;
+  max-width: 640px;
 }
 
 /* Footer */
