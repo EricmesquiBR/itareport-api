@@ -10,7 +10,7 @@ const envShape = z.object({
   HOST: z.string().default("0.0.0.0"),
   POSTGRES_HOST: z.string().optional(),
   POSTGRES_USER: z.string().default("postgres").optional(),
-  POSTGRES_PASSWORD: z.string().optional(),
+  POSTGRES_PASSWORD: z.string().min(1, "POSTGRES_PASSWORD is required"),
   POSTGRES_DB: z.string().optional(),
   POSTGRES_PORT: z.coerce.number().positive().default(5432).optional(),
   REDIS_PORT: z.coerce.number().positive().default(6379).optional(),
