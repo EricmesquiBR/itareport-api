@@ -41,11 +41,22 @@ export const reportRoutes = new Hono()
   })
   .get("/", async (c) => {
     try {
-      const reports = await reportService.findAllReports();
+      const limit = parseInt(c.req.query("limit") ?? "50");
+      const offset = parseInt(c.req.query("offset") ?? "0");
+
+      const result = await reportService.findAllReports({
+        limit: Math.min(limit, 100),
+        offset: Math.max(offset, 0),
+      });
 
       return c.json({
         success: true,
-        data: reports,
+        data: result.data,
+        pagination: {
+          total: result.total,
+          limit: result.limit,
+          offset: result.offset,
+        },
         message: "Reports found successfully",
       });
     } catch (error) {

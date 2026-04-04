@@ -25,6 +25,11 @@ interface UpdateReportInput {
   categoryId?: string;
 }
 
+interface PaginationParams {
+  limit: number;
+  offset: number;
+}
+
 export async function createReport(input: CreateReportInput) {
   const [report] = await db.insert(reports).values(input).returning();
   return report;
@@ -35,9 +40,18 @@ export async function findReportById(id: string) {
   return report;
 }
 
-export async function findAllReports() {
-  const reportsList = await db.select().from(reports);
-  return reportsList;
+export async function findAllReports({ limit, offset }: PaginationParams) {
+  const [data, countResult] = await Promise.all([
+    db.select().from(reports).limit(limit).offset(offset),
+    db.select({ count: reports.id }).from(reports),
+  ]);
+
+  return {
+    data,
+    total: countResult.length,
+    limit,
+    offset,
+  };
 }
 
 export async function updateReport(id: string, data: UpdateReportInput) {
