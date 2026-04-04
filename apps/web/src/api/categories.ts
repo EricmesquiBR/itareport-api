@@ -19,14 +19,31 @@ export type Report = {
   categoryId: string;
 };
 
+let cachedCategories: Category[] | null = null;
+let categoriesPromise: Promise<Category[]> | null = null;
+
 export async function createCategory(name: string) {
   const response = await api.post("/categories", { name });
+  cachedCategories = null;
+  categoriesPromise = null;
   return response.data.data as Category;
 }
 
 export async function getCategories() {
-  const response = await api.get("/categories");
-  return response.data.data as Category[];
+  if (cachedCategories) return cachedCategories;
+  if (!categoriesPromise) {
+    categoriesPromise = api.get("/categories").then(
+      (response) => {
+        cachedCategories = response.data.data as Category[];
+        return cachedCategories;
+      },
+      () => {
+        categoriesPromise = null;
+        throw new Error("Failed to fetch categories");
+      },
+    );
+  }
+  return categoriesPromise;
 }
 
 export async function getReportsByCategory(id: string) {
