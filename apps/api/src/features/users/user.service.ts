@@ -30,11 +30,6 @@ export async function findUserById(id: string) {
   return user;
 }
 
-export async function findAllUsers() {
-  const usersList = await db.select().from(users);
-  return usersList;
-}
-
 export async function updateUser(id: string, data: UpdateUserInput) {
   const [user] = await db.update(users).set(data).where(eq(users.id, id)).returning();
   return user;

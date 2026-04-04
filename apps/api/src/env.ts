@@ -13,7 +13,6 @@ const envShape = z.object({
   POSTGRES_PASSWORD: z.string().min(1, "POSTGRES_PASSWORD is required"),
   POSTGRES_DB: z.string().optional(),
   POSTGRES_PORT: z.coerce.number().positive().default(5432).optional(),
-  REDIS_PORT: z.coerce.number().positive().default(6379).optional(),
   LOG_LEVEL: z
     .enum(["fatal", "error", "warn", "info", "debug", "trace"])
     .default("info")
