@@ -3,8 +3,6 @@ import { lazy, Suspense, useEffect, useState, type FormEvent } from "react";
 
 import { createReport } from "@/api/reports";
 import { getCategories } from "@/api/categories";
-import Footer from "@/components/footer";
-import Header from "@/components/header";
 import Loading from "@/components/loading";
 import { useGlobalContext } from "@/context/store";
 
@@ -65,9 +63,7 @@ function ReportForm() {
   };
 
   return (
-    <>
-      <Header />
-      <div className="grid grid-cols-2">
+    <div className="grid grid-cols-2">
         <form className="flex justify-center items-center pt-36 pb-36" onSubmit={handleSubmit}>
           <div className="form-register grid grid-cols-2 gap-3 p-6 shadow-lg bg-slate-50 rounded-md">
             <h1 className="text-3xl block text-center font-semibold col-span-2">
@@ -177,8 +173,6 @@ function ReportForm() {
         <Suspense fallback={<Loading />}>
           <ReportFormMap />
         </Suspense>
-      </div>
-      <Footer />
-    </>
+    </div>
   );
 }
