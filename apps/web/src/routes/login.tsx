@@ -62,16 +62,9 @@ function Login() {
             onChange={(e) => setPassword(e.target.value)}
           />
         </div>
-        <div className="mt-3 flex justify-between items-center">
-          <div>
-            <input type="checkbox" />
-            <label className="ps-1">Remember me</label>
-          </div>
-          <div>
-            <a href="#" className="text-gray-900 font-semibold">
-              Forgot my password
-            </a>
-          </div>
+        <div className="mt-3">
+          <input type="checkbox" />
+          <label className="ps-1">Remember me</label>
         </div>
         <div className="mt-5">
           <button
