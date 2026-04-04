@@ -4,6 +4,7 @@ import { generateToken, authMiddleware, getAuthUserId } from "../../middleware/a
 import bcrypt from "bcryptjs";
 import * as userService from "./user.service.js";
 import { createUserSchema, loginSchema, updateUserSchema } from "./user.schema.js";
+import { logger } from "../../lib/logger.js";
 
 const SALT_ROUNDS = 10;
 
@@ -14,108 +15,162 @@ function omitPassword<T extends { password: string }>(user: T) {
 
 export const userRoutes = new Hono()
   .post("/", zValidator("json", createUserSchema), async (c) => {
-    const body = c.req.valid("json");
-    const existingUser = await userService.findUserByEmail(body.email);
+    try {
+      const body = c.req.valid("json");
+      const existingUser = await userService.findUserByEmail(body.email);
 
-    if (existingUser) {
+      if (existingUser) {
+        return c.json(
+          {
+            success: false,
+            data: { email: body.email },
+            message: "User with this email already exist",
+          },
+          409,
+        );
+      }
+
+      const hashedPassword = await bcrypt.hash(body.password, SALT_ROUNDS);
+      const user = await userService.createUser({ ...body, password: hashedPassword });
+
+      if (!user) {
+        return c.json(
+          { success: false, message: "Failed to create user" },
+          500,
+        );
+      }
+
       return c.json(
-        {
-          success: false,
-          data: { email: body.email },
-          message: "User with this email already exist",
-        },
-        409,
+        { success: true, data: omitPassword(user), message: "User created successfully" },
+        201,
+      );
+    } catch (error) {
+      logger.error(error, "Error creating user");
+      return c.json(
+        { success: false, message: "Failed to create user" },
+        500,
       );
     }
-
-    const hashedPassword = await bcrypt.hash(body.password, SALT_ROUNDS);
-    const user = await userService.createUser({ ...body, password: hashedPassword });
-
-    return c.json(
-      { success: true, data: omitPassword(user!), message: "User created successfully" },
-      201,
-    );
   })
   .post("/login", zValidator("json", loginSchema), async (c) => {
-    const { email, password } = c.req.valid("json");
-    const user = await userService.findUserByEmail(email);
+    try {
+      const { email, password } = c.req.valid("json");
+      const user = await userService.findUserByEmail(email);
 
-    if (!user) {
-      return c.json({ success: false, data: { email }, message: "Could not find this user" }, 404);
+      if (!user) {
+        return c.json({ success: false, data: { email }, message: "Could not find this user" }, 404);
+      }
+
+      const passwordMatch = await bcrypt.compare(password, user.password);
+      if (!passwordMatch) {
+        return c.json({ success: false, data: { email }, message: "Incorrect password" }, 401);
+      }
+
+      const token = await generateToken(user.id);
+
+      return c.json({
+        success: true,
+        data: { user: omitPassword(user), token },
+        message: "User logged in successfully",
+      });
+    } catch (error) {
+      logger.error(error, "Error logging in user");
+      return c.json(
+        { success: false, message: "Failed to login" },
+        500,
+      );
     }
-
-    const passwordMatch = await bcrypt.compare(password, user.password);
-    if (!passwordMatch) {
-      return c.json({ success: false, data: { email }, message: "Incorrect password" }, 401);
-    }
-
-    const token = await generateToken(user.id);
-
-    return c.json({
-      success: true,
-      data: { user: omitPassword(user), token },
-      message: "User logged in successfully",
-    });
   })
   .get("/:id", authMiddleware(), async (c) => {
-    const { id } = c.req.param();
-    const user = await userService.findUserById(id);
+    try {
+      const { id } = c.req.param();
+      const user = await userService.findUserById(id);
 
-    if (!user) {
-      return c.json({ success: false, message: "Could not find this user" }, 404);
+      if (!user) {
+        return c.json({ success: false, message: "Could not find this user" }, 404);
+      }
+
+      return c.json({
+        success: true,
+        data: omitPassword(user),
+        message: "User found successfully",
+      });
+    } catch (error) {
+      logger.error(error, "Error fetching user");
+      return c.json(
+        { success: false, message: "Failed to fetch user" },
+        500,
+      );
     }
-
-    return c.json({
-      success: true,
-      data: omitPassword(user),
-      message: "User found successfully",
-    });
   })
   .put("/:id", authMiddleware(), zValidator("json", updateUserSchema), async (c) => {
-    const { id } = c.req.param();
-    const body = c.req.valid("json");
-    const authUserId = getAuthUserId(c);
+    try {
+      const { id } = c.req.param();
+      const body = c.req.valid("json");
+      const authUserId = getAuthUserId(c);
 
-    if (id !== authUserId) {
-      return c.json({ success: false, message: "Forbidden" }, 403);
+      if (id !== authUserId) {
+        return c.json({ success: false, message: "Forbidden" }, 403);
+      }
+
+      const existing = await userService.findUserById(id);
+      if (!existing) {
+        return c.json({ success: false, data: { id }, message: "Could not find this user" }, 404);
+      }
+
+      const data = { ...body };
+      if (body.password) {
+        data.password = await bcrypt.hash(body.password, SALT_ROUNDS);
+      }
+
+      const updatedUser = await userService.updateUser(id, data);
+
+      if (!updatedUser) {
+        return c.json(
+          { success: false, message: "Failed to update user" },
+          500,
+        );
+      }
+
+      return c.json({
+        success: true,
+        data: omitPassword(updatedUser),
+        message: "User updated successfully",
+      });
+    } catch (error) {
+      logger.error(error, "Error updating user");
+      return c.json(
+        { success: false, message: "Failed to update user" },
+        500,
+      );
     }
-
-    const existing = await userService.findUserById(id);
-    if (!existing) {
-      return c.json({ success: false, data: { id }, message: "Could not find this user" }, 404);
-    }
-
-    const data = { ...body };
-    if (body.password) {
-      data.password = await bcrypt.hash(body.password, SALT_ROUNDS);
-    }
-
-    const updatedUser = await userService.updateUser(id, data);
-
-    return c.json({
-      success: true,
-      data: omitPassword(updatedUser!),
-      message: "User updated successfully",
-    });
   })
   .delete("/:id", authMiddleware(), async (c) => {
-    const { id } = c.req.param();
-    const authUserId = getAuthUserId(c);
+    try {
+      const { id } = c.req.param();
+      const authUserId = getAuthUserId(c);
 
-    if (id !== authUserId) {
-      return c.json({ success: false, message: "Forbidden" }, 403);
+      if (id !== authUserId) {
+        return c.json({ success: false, message: "Forbidden" }, 403);
+      }
+
+      const existing = await userService.findUserById(id);
+      if (!existing) {
+        return c.json({ success: false, data: { id }, message: "Could not find this user" }, 404);
+      }
+
+      await userService.deleteUserById(id);
+
+      return c.json({
+        success: true,
+        data: { id },
+        message: "User deleted successfully",
+      });
+    } catch (error) {
+      logger.error(error, "Error deleting user");
+      return c.json(
+        { success: false, message: "Failed to delete user" },
+        500,
+      );
     }
-
-    const existing = await userService.findUserById(id);
-    if (!existing) {
-      return c.json({ success: false, data: { id }, message: "Could not find this user" }, 404);
-    }
-
-    await userService.deleteUserById(id);
-
-    return c.json({
-      success: true,
-      data: { id },
-      message: "User deleted successfully",
-    });
   });
