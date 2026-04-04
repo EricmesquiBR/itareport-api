@@ -4,12 +4,15 @@ import L from "leaflet";
 import { useEffect, useState } from "react";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 
-import { api } from "@/lib/api";
+import { getReports } from "@/api/reports";
+import { getCategories, getReportsByCategory } from "@/api/categories";
 
-type Category = {
-  id: string;
-  name: string;
-};
+const pin = L.icon({
+  iconUrl: "/pinmap.svg",
+  iconSize: [20, 20],
+  iconAnchor: [17, 20],
+  popupAnchor: [17, -48],
+});
 
 type Report = {
   id: string;
@@ -22,31 +25,29 @@ type Report = {
 export default function IssueMap() {
   const [markersData, setMarkersData] = useState<Report[] | null>([]);
   const [idCat, setIdCat] = useState("");
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
 
   useEffect(() => {
-    api.get("/categories").then((response) => {
-      setCategories(response.data.data);
-    });
+    getCategories().then(setCategories);
   }, []);
 
   useEffect(() => {
-    const url = idCat === "" ? "/reports" : `/categories/${idCat}/reports`;
-    api
-      .get(url)
-      .then((response) => setMarkersData(response.data.data))
-      .catch((error: unknown) => {
+    const fetchReports = async () => {
+      try {
+        const result =
+          idCat === ""
+            ? await getReports(1000)
+            : await getReportsByCategory(idCat);
+
+        setMarkersData(Array.isArray(result) ? result : result.data);
+      } catch (error) {
         console.error("Error:", error);
         setMarkersData(null);
-      });
-  }, [idCat]);
+      }
+    };
 
-  const pin = L.icon({
-    iconUrl: "/pinmap.svg",
-    iconSize: [20, 20],
-    iconAnchor: [17, 20],
-    popupAnchor: [17, -48],
-  });
+    fetchReports();
+  }, [idCat]);
 
   return (
     <>

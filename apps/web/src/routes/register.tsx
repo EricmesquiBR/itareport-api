@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 
+import { createUser } from "@/api/users";
 import Footer from "@/components/footer";
 import Header from "@/components/header";
-import { api } from "@/lib/api";
 
 export const Route = createFileRoute("/register")({
   component: Register,
@@ -30,17 +30,16 @@ function Register() {
       return;
     }
 
-    api
-      .post("/users", { name, cpf, email, password })
+    createUser({ name, cpf, email, password })
       .then((response) => {
-        if (!response.data.success) {
-          alert(response.data.message);
+        if (!response.success) {
+          alert(response.message);
           return;
         }
         alert("User registered successfully");
       })
-      .catch(() => {
-        alert("Error while registering user");
+      .catch((error) => {
+        alert(error.response?.data?.message ?? "Error while registering user");
       });
 
     setName("");

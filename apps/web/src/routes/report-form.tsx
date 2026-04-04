@@ -1,22 +1,18 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { lazy, Suspense, useEffect, useState, type FormEvent } from "react";
 
+import { createReport } from "@/api/reports";
+import { getCategories } from "@/api/categories";
 import Footer from "@/components/footer";
 import Header from "@/components/header";
 import Loading from "@/components/loading";
 import { useGlobalContext } from "@/context/store";
-import { api } from "@/lib/api";
 
 const ReportFormMap = lazy(() => import("@/components/report-form-map"));
 
 export const Route = createFileRoute("/report-form")({
   component: ReportForm,
 });
-
-type Category = {
-  id: string;
-  name: string;
-};
 
 function ReportForm() {
   const [title, setTitle] = useState("");
@@ -26,13 +22,11 @@ function ReportForm() {
   const [district, setDistrict] = useState("");
   const [city, setCity] = useState("");
   const { markerData } = useGlobalContext();
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
   const navigate = useNavigate();
 
   useEffect(() => {
-    api.get("/categories").then((response) => {
-      setCategories(response.data.data);
-    });
+    getCategories().then(setCategories);
   }, []);
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
@@ -48,27 +42,25 @@ function ReportForm() {
       return;
     }
 
-    api
-      .post("/reports", {
-        title,
-        content,
-        idCat,
-        street,
-        district,
-        city,
-        lat: markerData[0],
-        lng: markerData[1],
-      })
+    createReport({
+      title,
+      content,
+      idCat,
+      street,
+      district,
+      city,
+      lat: markerData[0],
+      lng: markerData[1],
+    })
       .then((response) => {
-        if (response.data.success) {
-          alert(response.data.message);
+        if (response.success) {
           navigate({ to: "/map" });
         } else {
-          alert(response.data.message);
+          alert(response.message);
         }
       })
-      .catch(() => {
-        alert("Error while submitting report");
+      .catch((error) => {
+        alert(error.response?.data?.message ?? "Error while submitting report");
       });
   };
 

@@ -1,10 +1,10 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 
+import { login } from "@/api/users";
 import Footer from "@/components/footer";
 import Header from "@/components/header";
 import { useGlobalContext } from "@/context/store";
-import { api } from "@/lib/api";
 
 export const Route = createFileRoute("/login")({
   component: Login,
@@ -19,20 +19,14 @@ function Login() {
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    api
-      .post("/users/login", { email, password })
-      .then((response) => {
-        if (!response.data.success) {
-          alert(response.data.message);
-          return;
-        }
-        setUserId(response.data.data.user.id);
-        setToken(response.data.data.token);
-        alert(response.data.message);
+    login(email, password)
+      .then((data) => {
+        setUserId(data.user.id);
+        setToken(data.token);
         navigate({ to: "/" });
       })
-      .catch(() => {
-        alert("Error while logging in");
+      .catch((error) => {
+        alert(error.response?.data?.message ?? "Error while logging in");
       });
 
     setEmail("");
