@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { SHA256 } from "crypto-js";
 import { useState, type FormEvent } from "react";
 
 import Footer from "@/components/footer";
@@ -31,12 +30,10 @@ function Register() {
       return;
     }
 
-    const hashedPassword = SHA256(password).toString();
-
     api
-      .post("/users", { name, cpf, email, password: hashedPassword })
+      .post("/users", { name, cpf, email, password })
       .then((response) => {
-        if (response.data.error) {
+        if (!response.data.success) {
           alert(response.data.message);
           return;
         }

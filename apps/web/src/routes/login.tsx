@@ -1,5 +1,4 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { SHA256 } from "crypto-js";
 import { useState, type FormEvent } from "react";
 
 import Footer from "@/components/footer";
@@ -20,12 +19,10 @@ function Login() {
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const hashedPassword = SHA256(password).toString();
-
     api
-      .post("/users/login", { email, password: hashedPassword })
+      .post("/users/login", { email, password })
       .then((response) => {
-        if (response.data.error || !response.data.success) {
+        if (!response.data.success) {
           alert(response.data.message);
           return;
         }

@@ -1,7 +1,10 @@
 import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
+import bcrypt from "bcryptjs";
 import * as userService from "./user.service.js";
 import { createUserSchema, loginSchema, updateUserSchema } from "./user.schema.js";
+
+const SALT_ROUNDS = 10;
 
 function omitPassword<T extends { password: string }>(user: T) {
   const { password: _, ...rest } = user;
@@ -24,7 +27,8 @@ export const userRoutes = new Hono()
       );
     }
 
-    const user = await userService.createUser(body);
+    const hashedPassword = await bcrypt.hash(body.password, SALT_ROUNDS);
+    const user = await userService.createUser({ ...body, password: hashedPassword });
 
     return c.json(
       { success: true, data: omitPassword(user!), message: "User created successfully" },
@@ -39,7 +43,8 @@ export const userRoutes = new Hono()
       return c.json({ success: false, data: { email }, message: "Could not find this user" }, 404);
     }
 
-    if (user.password !== password) {
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) {
       return c.json({ success: false, data: { email }, message: "Incorrect password" }, 401);
     }
 
@@ -72,7 +77,12 @@ export const userRoutes = new Hono()
       return c.json({ success: false, data: { id }, message: "Could not find this user" }, 404);
     }
 
-    const updatedUser = await userService.updateUser(id, body);
+    const data = { ...body };
+    if (body.password) {
+      data.password = await bcrypt.hash(body.password, SALT_ROUNDS);
+    }
+
+    const updatedUser = await userService.updateUser(id, data);
 
     return c.json({
       success: true,
