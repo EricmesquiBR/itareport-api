@@ -2,24 +2,6 @@ import { eq } from "drizzle-orm";
 import { db } from "../../db/index.js";
 import { users } from "../../db/schema.js";
 
-interface CreateUserInput {
-  name: string;
-  cpf: string;
-  email: string;
-  password: string;
-}
-
-interface UpdateUserInput {
-  name?: string;
-  email?: string;
-  password?: string;
-}
-
-export async function createUser(input: CreateUserInput) {
-  const [user] = await db.insert(users).values(input).returning();
-  return user;
-}
-
 export async function findUserByEmail(email: string) {
   const [user] = await db.select().from(users).where(eq(users.email, email)).limit(1);
   return user;
@@ -30,8 +12,17 @@ export async function findUserById(id: string) {
   return user;
 }
 
-export async function updateUser(id: string, data: UpdateUserInput) {
+export async function updateUser(id: string, data: { email?: string }) {
   const [user] = await db.update(users).set(data).where(eq(users.id, id)).returning();
+  return user;
+}
+
+export async function softDeleteUser(id: string) {
+  const [user] = await db
+    .update(users)
+    .set({ deletedAt: new Date() })
+    .where(eq(users.id, id))
+    .returning();
   return user;
 }
 
