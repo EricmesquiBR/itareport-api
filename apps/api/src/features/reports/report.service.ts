@@ -4,22 +4,14 @@ import { reports } from "../../db/schema.js";
 
 interface CreateReportInput {
   title: string;
-  content: string;
   userId: string;
   categoryId: string;
-  street: string;
-  district: string;
-  city: string;
   lat: number;
   lng: number;
 }
 
 interface UpdateReportInput {
   title?: string;
-  content?: string;
-  street?: string;
-  district?: string;
-  city?: string;
   lat?: number;
   lng?: number;
   categoryId?: string;

@@ -13,30 +13,20 @@ export const reportRoutes = new Hono()
 
       const report = await reportService.createReport({
         title: body.title,
-        content: body.content,
         userId,
         categoryId: body.categoryId,
-        street: body.street,
-        district: body.district,
-        city: body.city,
         lat: body.lat,
         lng: body.lng,
       });
 
       if (!report) {
-        return c.json(
-          { success: false, message: "Failed to create report" },
-          500,
-        );
+        return c.json({ success: false, message: "Failed to create report" }, 500);
       }
 
       return c.json({ success: true, data: report, message: "Report created successfully" }, 201);
     } catch (error) {
       logger.error(error, "Error creating report");
-      return c.json(
-        { success: false, message: "Failed to create report" },
-        500,
-      );
+      return c.json({ success: false, message: "Failed to create report" }, 500);
     }
   })
   .get("/", async (c) => {
@@ -61,10 +51,7 @@ export const reportRoutes = new Hono()
       });
     } catch (error) {
       logger.error(error, "Error fetching reports");
-      return c.json(
-        { success: false, message: "Failed to fetch reports" },
-        500,
-      );
+      return c.json({ success: false, message: "Failed to fetch reports" }, 500);
     }
   })
   .get("/:id", async (c) => {
@@ -76,17 +63,10 @@ export const reportRoutes = new Hono()
         return c.json({ success: false, message: "Could not find this report" }, 404);
       }
 
-      return c.json({
-        success: true,
-        data: report,
-        message: "Report found successfully",
-      });
+      return c.json({ success: true, data: report, message: "Report found successfully" });
     } catch (error) {
       logger.error(error, "Error fetching report");
-      return c.json(
-        { success: false, message: "Failed to fetch report" },
-        500,
-      );
+      return c.json({ success: false, message: "Failed to fetch report" }, 500);
     }
   })
   .put("/:id", authMiddleware(), zValidator("json", updateReportSchema), async (c) => {
@@ -106,33 +86,19 @@ export const reportRoutes = new Hono()
 
       const updatedReport = await reportService.updateReport(id, {
         title: body.title,
-        content: body.content,
-        street: body.street,
-        district: body.district,
-        city: body.city,
         lat: body.lat,
         lng: body.lng,
         categoryId: body.categoryId,
       });
 
       if (!updatedReport) {
-        return c.json(
-          { success: false, message: "Failed to update report" },
-          500,
-        );
+        return c.json({ success: false, message: "Failed to update report" }, 500);
       }
 
-      return c.json({
-        success: true,
-        data: updatedReport,
-        message: "Report updated successfully",
-      });
+      return c.json({ success: true, data: updatedReport, message: "Report updated successfully" });
     } catch (error) {
       logger.error(error, "Error updating report");
-      return c.json(
-        { success: false, message: "Failed to update report" },
-        500,
-      );
+      return c.json({ success: false, message: "Failed to update report" }, 500);
     }
   })
   .delete("/:id", authMiddleware(), async (c) => {
@@ -151,16 +117,9 @@ export const reportRoutes = new Hono()
 
       await reportService.deleteReportById(id);
 
-      return c.json({
-        success: true,
-        data: { id },
-        message: "Report deleted successfully",
-      });
+      return c.json({ success: true, data: { id }, message: "Report deleted successfully" });
     } catch (error) {
       logger.error(error, "Error deleting report");
-      return c.json(
-        { success: false, message: "Failed to delete report" },
-        500,
-      );
+      return c.json({ success: false, message: "Failed to delete report" }, 500);
     }
   });
