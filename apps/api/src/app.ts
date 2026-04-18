@@ -34,7 +34,7 @@ app.use("*", async (c, next) => {
       status: c.res.status,
       ms,
       ip,
-      requestId: c.get("requestId"),
+      requestId: c.res.headers.get("X-Request-ID") ?? undefined,
     },
     `HTTP ${c.req.method} ${c.req.path}`,
   );
@@ -64,7 +64,7 @@ app.get("/v1/health", (c) => {
 
 app.on(["GET", "POST"], "/api/auth/**", async (c) => {
   if (c.req.method === "POST" && c.req.path === "/api/auth/sign-in/email") {
-    const body = await c.req.raw.clone().json().catch(() => null);
+    const body = await c.req.raw.clone().json().catch(() => null) as { email?: string } | null;
     if (body?.email) {
       const user = await findUserByEmail(body.email);
       if (user?.deletedAt) {

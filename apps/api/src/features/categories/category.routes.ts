@@ -7,8 +7,8 @@ import { logger } from "../../lib/logger.js";
 export const categoryRoutes = new Hono()
   .post("/", zValidator("json", createCategorySchema), async (c) => {
     try {
-      const { name } = c.req.valid("json");
-      const category = await categoryService.createCategory(name);
+      const { name, slug } = c.req.valid("json");
+      const category = await categoryService.createCategory(name, slug);
 
       if (!category) {
         return c.json(

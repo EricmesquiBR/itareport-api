@@ -10,7 +10,7 @@ describe("users schema", () => {
       .values({ email: "civic@test.com" })
       .returning();
 
-    expect(user.username).toMatch(/^[a-z]+-[a-z]+-\d{1,4}$/);
+    expect(user!.username).toMatch(/^[a-z]+-[a-z]+-\d{1,4}$/);
   });
 
   it("deleted_at is null by default on fresh insert", async () => {
@@ -19,7 +19,7 @@ describe("users schema", () => {
       .values({ email: "fresh@test.com" })
       .returning();
 
-    expect(user.deletedAt).toBeNull();
+    expect(user!.deletedAt).toBeNull();
   });
 
   it("soft delete sets deleted_at without removing the row", async () => {
@@ -31,15 +31,15 @@ describe("users schema", () => {
     await testDb
       .update(users)
       .set({ deletedAt: new Date() })
-      .where(eq(users.id, created.id));
+      .where(eq(users.id, created!.id));
 
     const [found] = await testDb
       .select()
       .from(users)
-      .where(eq(users.id, created.id));
+      .where(eq(users.id, created!.id));
 
     expect(found).toBeDefined();
-    expect(found.deletedAt).not.toBeNull();
+    expect(found!.deletedAt).not.toBeNull();
   });
 
   it("soft-deleted users are excluded by IS NULL filter", async () => {
@@ -56,7 +56,7 @@ describe("users schema", () => {
     await testDb
       .update(users)
       .set({ deletedAt: new Date() })
-      .where(eq(users.id, deleted.id));
+      .where(eq(users.id, deleted!.id));
 
     const visible = await testDb
       .select()
@@ -64,8 +64,8 @@ describe("users schema", () => {
       .where(isNull(users.deletedAt));
 
     const ids = visible.map((u) => u.id);
-    expect(ids).toContain(active.id);
-    expect(ids).not.toContain(deleted.id);
+    expect(ids).toContain(active!.id);
+    expect(ids).not.toContain(deleted!.id);
   });
 });
 
@@ -81,7 +81,7 @@ describe("reports schema", () => {
       .values({ name: "Buraco", slug: "buraco" })
       .returning();
 
-    return { user, category };
+    return { user: user!, category: category! };
   }
 
   it("defaults to pending status and zero counters on insert", async () => {
@@ -98,11 +98,11 @@ describe("reports schema", () => {
       })
       .returning();
 
-    expect(report.status).toBe("pending");
-    expect(report.credibility).toBe(0);
-    expect(report.upvotes).toBe(0);
-    expect(report.uniqueUpvoters).toBe(0);
-    expect(report.photoCount).toBe(0);
+    expect(report!.status).toBe("pending");
+    expect(report!.credibility).toBe(0);
+    expect(report!.upvotes).toBe(0);
+    expect(report!.uniqueUpvoters).toBe(0);
+    expect(report!.photoCount).toBe(0);
   });
 
   it("expires_at is null by default — set by service layer", async () => {
@@ -119,7 +119,7 @@ describe("reports schema", () => {
       })
       .returning();
 
-    expect(report.expiresAt).toBeNull();
+    expect(report!.expiresAt).toBeNull();
   });
 
   it("preserves report when its author is soft-deleted (user row still exists)", async () => {
@@ -144,10 +144,10 @@ describe("reports schema", () => {
     const [found] = await testDb
       .select()
       .from(reports)
-      .where(eq(reports.id, report.id));
+      .where(eq(reports.id, report!.id));
 
     expect(found).toBeDefined();
-    expect(found.id).toBe(report.id);
+    expect(found!.id).toBe(report!.id);
   });
 
   it("sets user_id to null when author is hard-deleted (ON DELETE SET NULL)", async () => {
@@ -169,10 +169,10 @@ describe("reports schema", () => {
     const [found] = await testDb
       .select()
       .from(reports)
-      .where(eq(reports.id, report.id));
+      .where(eq(reports.id, report!.id));
 
     expect(found).toBeDefined();
-    expect(found.userId).toBeNull();
+    expect(found!.userId).toBeNull();
   });
 
   it("accepts report with null user_id (anonymous report)", async () => {
@@ -190,6 +190,6 @@ describe("reports schema", () => {
       .returning();
 
     expect(report).toBeDefined();
-    expect(report.userId).toBeNull();
+    expect(report!.userId).toBeNull();
   });
 });

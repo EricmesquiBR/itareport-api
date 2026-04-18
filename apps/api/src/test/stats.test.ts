@@ -3,11 +3,13 @@ import { app } from "../app.js";
 import { testDb } from "./db.js";
 import { categories, reports, users } from "../db/schema.js";
 
+type StatsBody = { success: boolean; data: Record<string, number> };
+
 describe("GET /v1/stats", () => {
   it("returns stats with zeros on empty DB", async () => {
     const res = await app.request("/v1/stats");
     expect(res.status).toBe(200);
-    const body = await res.json();
+    const body = (await res.json()) as StatsBody;
     expect(body.success).toBe(true);
     expect(body.data).toMatchObject({
       totalReports: 0,
@@ -33,8 +35,8 @@ describe("GET /v1/stats", () => {
     await testDb.insert(reports).values([
       {
         title: "Buraco na rua",
-        lat: "-3.9200",
-        lng: "-39.5500",
+        lat: -3.9200,
+        lng: -39.5500,
         userId: user!.id,
         categoryId: cat!.id,
         status: "active",
@@ -42,8 +44,8 @@ describe("GET /v1/stats", () => {
       },
       {
         title: "Poste apagado",
-        lat: "-3.9210",
-        lng: "-39.5510",
+        lat: -3.9210,
+        lng: -39.5510,
         userId: user!.id,
         categoryId: cat!.id,
         status: "pending",
@@ -52,7 +54,7 @@ describe("GET /v1/stats", () => {
     ]);
 
     const res = await app.request("/v1/stats");
-    const body = await res.json();
+    const body = (await res.json()) as StatsBody;
     expect(body.data.totalReports).toBe(2);
     expect(body.data.activeReports).toBe(1);
     expect(body.data.pendingReports).toBe(1);
