@@ -6,6 +6,7 @@ import { getConnInfo } from "@hono/node-server/conninfo";
 import { userRoutes } from "./features/users/user.routes.js";
 import { reportRoutes } from "./features/reports/report.routes.js";
 import { categoryRoutes } from "./features/categories/category.routes.js";
+import { statsRoutes } from "./features/stats/stats.routes.js";
 import { auth } from "./lib/auth.js";
 import { findUserByEmail } from "./features/users/user.service.js";
 import { logger } from "./lib/logger.js";
@@ -78,6 +79,7 @@ const v1 = new Hono();
 v1.route("/users", userRoutes);
 v1.route("/reports", reportRoutes);
 v1.route("/categories", categoryRoutes);
+v1.route("/stats", statsRoutes);
 
 app.route("/v1", v1);
 
