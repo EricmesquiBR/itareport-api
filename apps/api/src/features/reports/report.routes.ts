@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { getConnInfo } from "@hono/node-server/conninfo";
 import * as reportService from "./report.service.js";
+import * as voteService from "../votes/vote.service.js";
 import { authMiddleware, getAuthUserId } from "../../middleware/auth.js";
 import { isInsideBbox, fuzzCoords } from "../../lib/geofencing.js";
 import { processImage } from "../../lib/image.js";
@@ -103,6 +104,32 @@ export const reportRoutes = new Hono()
     } catch (error) {
       logger.error(error, "Error fetching reports");
       return c.json({ success: false, message: "Failed to fetch reports" }, 500);
+    }
+  })
+  .post("/:id/vote", authMiddleware(), async (c) => {
+    try {
+      const { id } = c.req.param();
+      const userId = getAuthUserId(c);
+      const result = await voteService.addVote(userId, id);
+
+      if ("duplicate" in result && result.duplicate) {
+        return c.json({ success: false, message: "Already voted on this report" }, 409);
+      }
+
+      return c.json({ success: true, data: result, message: "Vote recorded" }, 201);
+    } catch (error) {
+      logger.error(error, "Error recording vote");
+      return c.json({ success: false, message: "Failed to record vote" }, 500);
+    }
+  })
+  .get("/:id/votes", async (c) => {
+    try {
+      const { id } = c.req.param();
+      const data = await voteService.getVoteCount(id);
+      return c.json({ success: true, data, message: "Vote count retrieved" });
+    } catch (error) {
+      logger.error(error, "Error fetching vote count");
+      return c.json({ success: false, message: "Failed to fetch vote count" }, 500);
     }
   })
   .get("/:id", async (c) => {
