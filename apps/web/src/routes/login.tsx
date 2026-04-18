@@ -1,8 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 
-import { login } from "@/api/users";
-import { useGlobalContext } from "@/context/store";
+import { signIn } from "@/lib/auth-client";
 
 export const Route = createFileRoute("/login")({
   component: Login,
@@ -13,7 +12,6 @@ function Login() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const { setUserId, setToken } = useGlobalContext();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -21,26 +19,23 @@ function Login() {
     setError("");
     setLoading(true);
 
-    try {
-      const data = await login(email, password);
-      setUserId(data.user.id);
-      setToken(data.token);
-      navigate({ to: "/" });
-    } catch (err: unknown) {
-      const axiosError = err as { response?: { data?: { message?: string } } };
-      setError(axiosError.response?.data?.message ?? "Error while logging in");
-    } finally {
-      setLoading(false);
+    const { error: authError } = await signIn.email({ email, password });
+
+    setLoading(false);
+
+    if (authError) {
+      setError(authError.message ?? "Credenciais inválidas");
+      setPassword("");
+      return;
     }
 
-    setEmail("");
-    setPassword("");
+    navigate({ to: "/" });
   };
 
   return (
-    <div className="flex justify-center items-center pt-48 pb-48">
+    <div className="flex justify-center items-center pt-48 pb-48 px-4">
       <form className="form-login p-6 shadow-lg bg-slate-50 rounded-md" onSubmit={handleSubmit}>
-        <h1 className="text-3xl block text-center font-semibold">Login</h1>
+        <h1 className="text-3xl block text-center font-semibold">Entrar</h1>
         <hr className="mt-3" />
         {error && (
           <div className="mt-3 p-2 bg-red-100 border border-red-400 text-red-700 rounded text-sm">
@@ -52,30 +47,30 @@ function Login() {
             Email
           </label>
           <input
-            type="text"
+            type="email"
             id="email"
-            className="border w-full text-base px-2 py-1 focus:outline-none focus:ring-0 focus:border-gray-600"
-            placeholder="Enter your email..."
+            required
+            autoComplete="email"
+            className="border w-full text-base px-2 py-1 focus:outline-none focus:border-gray-600"
+            placeholder="seu@email.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
         </div>
         <div className="mt-3">
           <label htmlFor="password" className="block text-base mb-2">
-            Password
+            Senha
           </label>
           <input
             type="password"
             id="password"
-            className="border w-full text-base px-2 py-1 focus:outline-none focus:ring-0 focus:border-gray-600"
-            placeholder="Enter your password..."
+            required
+            autoComplete="current-password"
+            className="border w-full text-base px-2 py-1 focus:outline-none focus:border-gray-600"
+            placeholder="Digite sua senha"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-        </div>
-        <div className="mt-3">
-          <input type="checkbox" />
-          <label className="ps-1">Remember me</label>
         </div>
         <div className="mt-5">
           <button
@@ -83,7 +78,7 @@ function Login() {
             disabled={loading}
             className="border-2 border-gray-900 bg-gray-900 text-white py-1 w-full rounded-md hover:bg-transparent hover:text-gray-900 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? "Logging in..." : "Login"}
+            {loading ? "Entrando..." : "Entrar"}
           </button>
         </div>
       </form>

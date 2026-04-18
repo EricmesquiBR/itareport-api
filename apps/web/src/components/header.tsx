@@ -1,16 +1,18 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 
-import { useGlobalContext } from "@/context/store";
+import { signOut, useSession } from "@/lib/auth-client";
 
 export default function Header() {
-  const { userId, logout } = useGlobalContext();
+  const { data: session, isPending } = useSession();
   const navigate = useNavigate();
 
-  const handleLogout = (event: React.MouseEvent<HTMLAnchorElement>) => {
+  const handleLogout = async (event: React.MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault();
-    logout();
+    await signOut();
     navigate({ to: "/" });
   };
+
+  const loggedIn = !!session?.user;
 
   return (
     <header className="flex items-center justify-between bg-gray-900 py-10 px-6">
@@ -18,16 +20,16 @@ export default function Header() {
         <Link to="/">ItaReport</Link>
       </div>
       <nav className="space-x-5">
-        {!userId ? (
+        {isPending ? null : !loggedIn ? (
           <>
             <Link to="/login" className="text-white">
-              Login
+              Entrar
             </Link>
             <Link
               to="/register"
               className="text-white rounded-md border border-slate-100 p-2 hover:bg-slate-100 hover:text-gray-900 transition duration-100 ease-in-out"
             >
-              Sign Up
+              Cadastrar
             </Link>
           </>
         ) : (
@@ -36,10 +38,10 @@ export default function Header() {
               to="/report-form"
               className="text-white rounded-md border border-slate-100 p-2 hover:bg-slate-100 hover:text-gray-900 transition duration-100 ease-in-out"
             >
-              Report Issue
+              Reportar
             </Link>
             <a href="/" className="text-white" onClick={handleLogout}>
-              Sign Out
+              Sair
             </a>
           </>
         )}
