@@ -10,8 +10,11 @@ import { auth } from "./lib/auth.js";
 import { findUserByEmail } from "./features/users/user.service.js";
 import { logger } from "./lib/logger.js";
 import { env } from "./env.js";
+import { correlationIdMiddleware } from "./middleware/correlation-id.js";
 
 export const app = new Hono();
+
+app.use("*", correlationIdMiddleware());
 
 app.use("*", async (c, next) => {
   const start = Date.now();
@@ -30,6 +33,7 @@ app.use("*", async (c, next) => {
       status: c.res.status,
       ms,
       ip,
+      requestId: c.get("requestId"),
     },
     `HTTP ${c.req.method} ${c.req.path}`,
   );
