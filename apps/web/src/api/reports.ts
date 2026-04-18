@@ -1,68 +1,73 @@
 import { api } from "@/lib/api";
+import { env } from "@/env";
+
+export type ReportStatus = "pending" | "active" | "expired";
 
 export type Report = {
   id: string;
   title: string;
-  content: string;
-  street: string;
-  district: string;
-  city: string;
   lat: number;
   lng: number;
-  validated: boolean;
-  userId: string;
-  categoryId: string;
+  status: ReportStatus;
+  credibility: number;
+  upvotes: number;
+  categoryId: string | null;
+  expiresAt: string | null;
+  createdAt: string;
+  updatedAt: string;
 };
 
-export type PaginationResult<T> = {
-  data: T[];
-  total: number;
-  limit: number;
-  offset: number;
+export type ReportImage = {
+  id: string;
+  storageKey: string;
+  isPrimary: boolean;
 };
 
-export async function createReport(data: {
+export type ReportWithImages = Report & { images: ReportImage[] };
+
+export type Pagination = { total: number; page: number; limit: number; offset: number };
+
+export function imageUrl(storageKey: string): string {
+  return `${env.STORAGE_URL}/${storageKey}`;
+}
+
+export async function createReport(input: {
   title: string;
-  content: string;
   categoryId: string;
-  street: string;
-  district: string;
-  city: string;
   lat: number;
   lng: number;
-}) {
-  const response = await api.post("/reports", data);
-  return response.data;
+  image: File;
+}): Promise<Report> {
+  const form = new FormData();
+  form.append("title", input.title);
+  form.append("categoryId", input.categoryId);
+  form.append("lat", String(input.lat));
+  form.append("lng", String(input.lng));
+  form.append("image", input.image);
+
+  const { data } = await api.post("/reports", form);
+  return data.data as Report;
 }
 
-export async function getReports(limit = 50, offset = 0) {
-  const response = await api.get("/reports", { params: { limit, offset } });
-  return response.data.data as PaginationResult<Report>;
+export async function getReports(params: {
+  page?: number;
+  limit?: number;
+  categoryId?: string;
+} = {}): Promise<{ data: Report[]; pagination: Pagination }> {
+  const { data } = await api.get("/reports", { params });
+  return { data: data.data as Report[], pagination: data.pagination as Pagination };
 }
 
-export async function getReportById(id: string) {
-  const response = await api.get(`/reports/${id}`);
-  return response.data.data as Report;
+export async function getReportById(id: string): Promise<ReportWithImages> {
+  const { data } = await api.get(`/reports/${id}`);
+  return data.data as ReportWithImages;
 }
 
-export async function updateReport(
-  id: string,
-  data: {
-    title?: string;
-    content?: string;
-    street?: string;
-    district?: string;
-    city?: string;
-    lat?: number;
-    lng?: number;
-    catId?: string;
-  },
-) {
-  const response = await api.put(`/reports/${id}`, data);
-  return response.data.data as Report;
+export async function voteOnReport(id: string): Promise<void> {
+  await api.post(`/reports/${id}/vote`);
 }
 
-export async function deleteReport(id: string) {
-  const response = await api.delete(`/reports/${id}`);
-  return response.data;
+export async function getVoteCount(id: string): Promise<{ upvotes: number }> {
+  const { data } = await api.get(`/reports/${id}/votes`);
+  return data.data as { upvotes: number };
 }

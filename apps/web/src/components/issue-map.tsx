@@ -1,11 +1,12 @@
 import "leaflet/dist/leaflet.css";
 
 import L from "leaflet";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 
-import { getReports } from "@/api/reports";
-import { getCategories, getReportsByCategory } from "@/api/categories";
+import { getReports, type Report } from "@/api/reports";
+import { getCategories, getReportsByCategory, type Category } from "@/api/categories";
+import { CENTRO_CENTER } from "@/lib/geofencing";
 
 const pin = L.icon({
   iconUrl: "/pinmap.svg",
@@ -14,89 +15,97 @@ const pin = L.icon({
   popupAnchor: [17, -48],
 });
 
-type Report = {
-  id: string;
-  title: string;
-  content: string;
-  lat?: number;
-  lng?: number;
-};
-
 export default function IssueMap() {
-  const [markersData, setMarkersData] = useState<Report[] | null>([]);
+  const [reports, setReports] = useState<Report[] | null>([]);
   const [categoryId, setCategoryId] = useState("");
-  const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
-    getCategories().then(setCategories);
+    getCategories().then(setCategories).catch(() => setCategories([]));
   }, []);
 
   useEffect(() => {
-    const fetchReports = async () => {
+    let cancelled = false;
+    setError(false);
+    (async () => {
       try {
-        const result =
-          categoryId === ""
-            ? await getReports(1000)
-            : await getReportsByCategory(categoryId);
-
-        setMarkersData(Array.isArray(result) ? result : result.data);
-      } catch (error) {
-        console.error("Error:", error);
-        setMarkersData(null);
+        const result = categoryId
+          ? await getReportsByCategory(categoryId)
+          : (await getReports({ limit: 100 })).data;
+        if (!cancelled) setReports(result);
+      } catch {
+        if (!cancelled) {
+          setReports(null);
+          setError(true);
+        }
       }
+    })();
+    return () => {
+      cancelled = true;
     };
-
-    fetchReports();
   }, [categoryId]);
 
+  const categoriesById = useMemo(
+    () => Object.fromEntries(categories.map((c) => [c.id, c.name])),
+    [categories],
+  );
+
   return (
-    <>
-      <div className="flex">
-        <label htmlFor="category" className="px-1">
-          Filter:
+    <div className="flex flex-col">
+      <div className="flex items-center gap-2 p-2 bg-slate-100 border-b">
+        <label htmlFor="category" className="text-sm font-medium">
+          Filtrar:
         </label>
         <select
           id="category"
-          className="flex border w-full text-base px-2 py-1 focus:outline-none focus:ring-0 focus:border-gray-600"
+          className="border text-sm px-2 py-1 rounded focus:outline-none focus:border-gray-600"
           value={categoryId}
           onChange={(e) => setCategoryId(e.target.value)}
         >
-          <option value="">All categories</option>
-          {categories.map((category) => (
-            <option key={category.id} value={category.id}>
-              {category.name}
+          <option value="">Todas as categorias</option>
+          {categories.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.name}
             </option>
           ))}
         </select>
+        <span className="text-xs text-gray-600 ml-auto">
+          {reports?.length ?? 0} reportes
+        </span>
       </div>
-      <div>
-        {!markersData ? (
-          <div className="loading flex items-center justify-center z-50">
-            Error: Reload the page
-          </div>
-        ) : (
-          <MapContainer center={[-3.9, -39.5]} zoom={10} scrollWheelZoom={true} minZoom={3}>
-            <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-            {markersData
-              .filter((report) => typeof report.lat === "number" && typeof report.lng === "number")
-              .map((report) => (
-                <Marker
-                  key={report.id}
-                  position={[report.lat as number, report.lng as number]}
-                  icon={pin}
-                >
-                  <Popup>
-                    <h3>{report.title}</h3>
-                    <p>{report.content}</p>
-                  </Popup>
-                </Marker>
-              ))}
-          </MapContainer>
-        )}
-      </div>
-    </>
+      {error ? (
+        <div className="loading">Erro ao carregar reportes. Recarregue a página.</div>
+      ) : (
+        <MapContainer
+          center={CENTRO_CENTER}
+          zoom={15}
+          scrollWheelZoom
+          minZoom={3}
+        >
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
+          {(reports ?? []).map((report) => (
+            <Marker
+              key={report.id}
+              position={[report.lat, report.lng]}
+              icon={pin}
+            >
+              <Popup>
+                <h3>{report.title}</h3>
+                <p>
+                  {report.categoryId ? categoriesById[report.categoryId] ?? "" : ""}
+                </p>
+                <p>
+                  {report.upvotes} confirmações · credibilidade {report.credibility}
+                </p>
+              </Popup>
+            </Marker>
+          ))}
+        </MapContainer>
+      )}
+    </div>
   );
 }

@@ -1,35 +1,16 @@
 import { api } from "@/lib/api";
+import type { Report } from "./reports";
 
 export type Category = {
   id: string;
   name: string;
-};
-
-export type Report = {
-  id: string;
-  title: string;
-  content: string;
-  street: string;
-  district: string;
-  city: string;
-  lat: number;
-  lng: number;
-  validated: boolean;
-  userId: string;
-  categoryId: string;
+  slug: string;
 };
 
 let cachedCategories: Category[] | null = null;
 let categoriesPromise: Promise<Category[]> | null = null;
 
-export async function createCategory(name: string) {
-  const response = await api.post("/categories", { name });
-  cachedCategories = null;
-  categoriesPromise = null;
-  return response.data.data as Category;
-}
-
-export async function getCategories() {
+export async function getCategories(): Promise<Category[]> {
   if (cachedCategories) return cachedCategories;
   if (!categoriesPromise) {
     categoriesPromise = api.get("/categories").then(
@@ -37,16 +18,16 @@ export async function getCategories() {
         cachedCategories = response.data.data as Category[];
         return cachedCategories;
       },
-      () => {
+      (err) => {
         categoriesPromise = null;
-        throw new Error("Failed to fetch categories");
+        throw err;
       },
     );
   }
   return categoriesPromise;
 }
 
-export async function getReportsByCategory(id: string) {
-  const response = await api.get(`/categories/${id}/reports`);
-  return response.data.data as Report[];
+export async function getReportsByCategory(id: string): Promise<Report[]> {
+  const { data } = await api.get(`/categories/${id}/reports`);
+  return data.data as Report[];
 }
