@@ -1,65 +1,96 @@
-import { eq } from "drizzle-orm";
+import { and, count, eq, gt } from "drizzle-orm";
 import { db } from "../../db/index.js";
-import { reports } from "../../db/schema.js";
+import { reportImages, reports } from "../../db/schema.js";
 
 interface CreateReportInput {
   title: string;
-  content: string;
   userId: string;
   categoryId: string;
-  street: string;
-  district: string;
-  city: string;
   lat: number;
   lng: number;
-}
-
-interface UpdateReportInput {
-  title?: string;
-  content?: string;
-  street?: string;
-  district?: string;
-  city?: string;
-  lat?: number;
-  lng?: number;
-  categoryId?: string;
 }
 
 interface PaginationParams {
   limit: number;
   offset: number;
+  categoryId?: string;
 }
 
-export async function createReport(input: CreateReportInput) {
-  const [report] = await db.insert(reports).values(input).returning();
+const PUBLIC_COLS = {
+  id: reports.id,
+  title: reports.title,
+  lat: reports.lat,
+  lng: reports.lng,
+  status: reports.status,
+  credibility: reports.credibility,
+  upvotes: reports.upvotes,
+  categoryId: reports.categoryId,
+  expiresAt: reports.expiresAt,
+  createdAt: reports.createdAt,
+  updatedAt: reports.updatedAt,
+};
+
+export async function createReport(input: CreateReportInput, storageKey: string) {
+  const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+
+  const result = await db
+    .insert(reports)
+    .values({
+      title: input.title,
+      lat: input.lat,
+      lng: input.lng,
+      userId: input.userId,
+      categoryId: input.categoryId,
+      status: "pending",
+      expiresAt,
+    })
+    .returning(PUBLIC_COLS);
+
+  const report = result[0]!;
+
+  await db.insert(reportImages).values({
+    reportId: report.id,
+    storageKey,
+    isPrimary: true,
+  });
+
   return report;
+}
+
+export async function findActiveReports({ limit, offset, categoryId }: PaginationParams) {
+  const now = new Date();
+  const conditions = [eq(reports.status, "active"), gt(reports.expiresAt, now)];
+  if (categoryId) conditions.push(eq(reports.categoryId, categoryId));
+
+  const [data, countRows] = await Promise.all([
+    db.select(PUBLIC_COLS).from(reports).where(and(...conditions)).limit(limit).offset(offset),
+    db.select({ value: count() }).from(reports).where(and(...conditions)),
+  ]);
+
+  const total = countRows[0]?.value ?? 0;
+
+  return { data, total, limit, offset };
 }
 
 export async function findReportById(id: string) {
-  const [report] = await db.select().from(reports).where(eq(reports.id, id)).limit(1);
-  return report;
-}
+  const now = new Date();
 
-export async function findAllReports({ limit, offset }: PaginationParams) {
-  const [data, countResult] = await Promise.all([
-    db.select().from(reports).limit(limit).offset(offset),
-    db.select({ count: reports.id }).from(reports),
-  ]);
+  const [report] = await db
+    .select(PUBLIC_COLS)
+    .from(reports)
+    .where(and(eq(reports.id, id), gt(reports.expiresAt, now)))
+    .limit(1);
 
-  return {
-    data,
-    total: countResult.length,
-    limit,
-    offset,
-  };
-}
+  if (!report) return null;
 
-export async function updateReport(id: string, data: UpdateReportInput) {
-  const [report] = await db.update(reports).set(data).where(eq(reports.id, id)).returning();
-  return report;
-}
+  const images = await db
+    .select({
+      id: reportImages.id,
+      storageKey: reportImages.storageKey,
+      isPrimary: reportImages.isPrimary,
+    })
+    .from(reportImages)
+    .where(eq(reportImages.reportId, id));
 
-export async function deleteReportById(id: string) {
-  const [deletedReport] = await db.delete(reports).where(eq(reports.id, id)).returning();
-  return deletedReport;
+  return { ...report, images };
 }

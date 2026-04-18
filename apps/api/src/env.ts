@@ -19,7 +19,11 @@ const envShape = z.object({
     .optional(),
   CORS_ORIGIN: z.string().default("*"),
   JWT_SECRET: z.string().min(32, "JWT_SECRET must be at least 32 characters"),
-  JWT_EXPIRES_IN: z.string().default("7d"),
+  S3_ENDPOINT: z.string().optional(),
+  S3_REGION: z.string().optional(),
+  S3_ACCESS_KEY: z.string().optional(),
+  S3_SECRET_KEY: z.string().optional(),
+  S3_BUCKET: z.string().default("itareport"),
 });
 
 const safeEnv = envShape.safeParse(process.env);

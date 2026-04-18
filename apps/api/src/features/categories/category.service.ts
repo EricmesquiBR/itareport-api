@@ -2,8 +2,8 @@ import { eq } from "drizzle-orm";
 import { db } from "../../db/index.js";
 import { categories, reports } from "../../db/schema.js";
 
-export async function createCategory(name: string) {
-  const [category] = await db.insert(categories).values({ name }).returning();
+export async function createCategory(name: string, slug: string) {
+  const [category] = await db.insert(categories).values({ name, slug }).returning();
   return category;
 }
 
