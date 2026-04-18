@@ -25,24 +25,61 @@ services:
       timeout: 3s
       retries: 5
 
-  api:
+  rustfs:
+    image: rustfs/rustfs:latest
+    environment:
+      RUSTFS_ACCESS_KEY: ${S3_ACCESS_KEY:-minioadmin}
+      RUSTFS_SECRET_KEY: ${S3_SECRET_KEY:-minioadmin}
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - rustfs-data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  migrator:
     build:
       context: .
-      dockerfile: docker/Dockerfile.api
+      dockerfile: infra/Dockerfile.api
     env_file:
       - apps/api/.env
     environment:
       POSTGRES_HOST: postgres
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: ["node_modules/.bin/drizzle-kit", "migrate"]
+    restart: "no"
+
+  api:
+    build:
+      context: .
+      dockerfile: infra/Dockerfile.api
+    env_file:
+      - apps/api/.env
+    environment:
+      POSTGRES_HOST: postgres
+      S3_ENDPOINT: http://rustfs:9000
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY:-minioadmin}
+      S3_SECRET_KEY: ${S3_SECRET_KEY:-minioadmin}
     ports:
       - "3000:3000"
     depends_on:
       postgres:
         condition: service_healthy
+      rustfs:
+        condition: service_healthy
+      migrator:
+        condition: service_completed_successfully
 
   web:
     build:
       context: .
-      dockerfile: docker/Dockerfile.web
+      dockerfile: infra/Dockerfile.web
       args:
         VITE_API_URL: ${VITE_API_URL:-/v1}
     ports:
@@ -52,3 +89,4 @@ services:
 
 volumes:
   postgres-data:
+  rustfs-data:
