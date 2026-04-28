@@ -15,6 +15,7 @@ import { Route as MapRouteImport } from "./routes/map"
 import { Route as LoginRouteImport } from "./routes/login"
 import { Route as AboutRouteImport } from "./routes/about"
 import { Route as IndexRouteImport } from "./routes/index"
+import { Route as ReportsIdRouteImport } from "./routes/reports.$id"
 
 const ReportFormRoute = ReportFormRouteImport.update({
   id: "/report-form",
@@ -46,6 +47,11 @@ const IndexRoute = IndexRouteImport.update({
   path: "/",
   getParentRoute: () => rootRouteImport,
 } as any)
+const ReportsIdRoute = ReportsIdRouteImport.update({
+  id: "/reports/$id",
+  path: "/reports/$id",
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   "/": typeof IndexRoute
@@ -54,6 +60,7 @@ export interface FileRoutesByFullPath {
   "/map": typeof MapRoute
   "/register": typeof RegisterRoute
   "/report-form": typeof ReportFormRoute
+  "/reports/$id": typeof ReportsIdRoute
 }
 export interface FileRoutesByTo {
   "/": typeof IndexRoute
@@ -62,6 +69,7 @@ export interface FileRoutesByTo {
   "/map": typeof MapRoute
   "/register": typeof RegisterRoute
   "/report-form": typeof ReportFormRoute
+  "/reports/$id": typeof ReportsIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -71,12 +79,27 @@ export interface FileRoutesById {
   "/map": typeof MapRoute
   "/register": typeof RegisterRoute
   "/report-form": typeof ReportFormRoute
+  "/reports/$id": typeof ReportsIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: "/" | "/about" | "/login" | "/map" | "/register" | "/report-form"
+  fullPaths:
+    | "/"
+    | "/about"
+    | "/login"
+    | "/map"
+    | "/register"
+    | "/report-form"
+    | "/reports/$id"
   fileRoutesByTo: FileRoutesByTo
-  to: "/" | "/about" | "/login" | "/map" | "/register" | "/report-form"
+  to:
+    | "/"
+    | "/about"
+    | "/login"
+    | "/map"
+    | "/register"
+    | "/report-form"
+    | "/reports/$id"
   id:
     | "__root__"
     | "/"
@@ -85,6 +108,7 @@ export interface FileRouteTypes {
     | "/map"
     | "/register"
     | "/report-form"
+    | "/reports/$id"
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -94,6 +118,7 @@ export interface RootRouteChildren {
   MapRoute: typeof MapRoute
   RegisterRoute: typeof RegisterRoute
   ReportFormRoute: typeof ReportFormRoute
+  ReportsIdRoute: typeof ReportsIdRoute
 }
 
 declare module "@tanstack/react-router" {
@@ -140,6 +165,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    "/reports/$id": {
+      id: "/reports/$id"
+      path: "/reports/$id"
+      fullPath: "/reports/$id"
+      preLoaderRoute: typeof ReportsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -150,6 +182,7 @@ const rootRouteChildren: RootRouteChildren = {
   MapRoute: MapRoute,
   RegisterRoute: RegisterRoute,
   ReportFormRoute: ReportFormRoute,
+  ReportsIdRoute: ReportsIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
