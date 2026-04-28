@@ -1,24 +1,32 @@
 {
-  "name": "itareport-api",
+  "name": "itareport",
   "version": "1.0.0",
-  "main": "index.js",
+  "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon src/server.js"
+    "build": "turbo build",
+    "dev": "turbo dev",
+    "dev:infra": "docker compose -f infra/compose.yaml up -d",
+    "dev:infra:down": "docker compose -f infra/compose.yaml down",
+    "lint": "turbo lint",
+    "lint:fix": "turbo lint:fix",
+    "fmt": "turbo fmt",
+    "fmt:check": "turbo fmt:check",
+    "type-check": "turbo type-check",
+    "db:generate": "turbo db:generate",
+    "db:migrate": "turbo db:migrate",
+    "db:push": "turbo db:push",
+    "db:studio": "turbo db:studio"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "@prisma/client": "^4.16.1",
-    "@types/node": "^20.3.2",
-    "cors": "^2.8.5",
-    "dotenv": "^16.3.1",
-    "express": "^4.18.2",
-    "nodemon": "^2.0.22",
-    "prisma": "^4.16.1",
-    "ts-node": "^10.9.1",
-    "typescript": "^5.1.5"
+  "devDependencies": {
+    "turbo": "^2.9.3"
   },
-  "description": ""
+  "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": ">=24"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  }
 }
