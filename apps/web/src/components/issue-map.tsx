@@ -1,5 +1,6 @@
 import "leaflet/dist/leaflet.css";
 
+import { Link } from "@tanstack/react-router";
 import L from "leaflet";
 import { useEffect, useMemo, useState } from "react";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
@@ -7,6 +8,7 @@ import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import { getReports, type Report } from "@/api/reports";
 import { getCategories, getReportsByCategory, type Category } from "@/api/categories";
 import { CENTRO_CENTER } from "@/lib/geofencing";
+import { UpvoteButton } from "./upvote-button";
 
 const pin = L.icon({
   iconUrl: "/pinmap.svg",
@@ -98,8 +100,12 @@ export default function IssueMap() {
                 <p>
                   {report.categoryId ? categoriesById[report.categoryId] ?? "" : ""}
                 </p>
+                <p>credibilidade {report.credibility}</p>
+                <UpvoteButton report={{ id: report.id, upvotes: report.upvotes }} />
                 <p>
-                  {report.upvotes} confirmações · credibilidade {report.credibility}
+                  <Link to="/reports/$id" params={{ id: report.id }}>
+                    Ver detalhes →
+                  </Link>
                 </p>
               </Popup>
             </Marker>
