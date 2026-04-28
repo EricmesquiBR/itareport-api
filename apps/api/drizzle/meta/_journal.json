@@ -15,6 +15,13 @@
       "when": 1776448707734,
       "tag": "0001_simple_eddie_brock",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1777414964756,
+      "tag": "0002_glossy_korvac",
+      "breakpoints": true
     }
   ]
 }

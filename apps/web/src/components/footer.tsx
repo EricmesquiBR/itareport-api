@@ -1,3 +1,5 @@
+import { Link } from "@tanstack/react-router";
+
 export default function Footer() {
   return (
     <footer className="bg-gray-900">
@@ -10,7 +12,7 @@ export default function Footer() {
           <h4 className="font-bold">More Information</h4>
           <ul>
             <li>
-              <a href="/about">About</a>
+              <Link to="/about">About</Link>
             </li>
           </ul>
         </div>

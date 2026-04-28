@@ -76,11 +76,6 @@ body {
   max-width: 640px;
 }
 
-.form-register {
-  width: 100%;
-  max-width: 640px;
-}
-
 /* Footer */
 footer {
   color: var(--white);

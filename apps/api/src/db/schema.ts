@@ -7,6 +7,7 @@ import {
   real,
   text,
   timestamp,
+  uniqueIndex,
   varchar,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
@@ -143,7 +144,9 @@ export const reportVotes = pgTable(
     voteType: voteTypeEnum("vote_type").default("up").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
-  (table) => [index("idx_report_votes_report_user").on(table.reportId, table.userId)],
+  (table) => [
+    uniqueIndex("uq_report_votes_report_user").on(table.reportId, table.userId),
+  ],
 );
 
 export const usersRelations = relations(users, ({ many }) => ({

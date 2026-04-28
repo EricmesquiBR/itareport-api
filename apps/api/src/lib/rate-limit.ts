@@ -1,5 +1,6 @@
 const WINDOW_MS = 15 * 60 * 1000;
 const MAX_REQUESTS = 5;
+const SWEEP_EVERY = 100;
 
 interface Entry {
   count: number;
@@ -7,9 +8,22 @@ interface Entry {
 }
 
 const store = new Map<string, Entry>();
+let sweepCounter = 0;
+
+function sweep(now: number) {
+  for (const [ip, entry] of store) {
+    if (now > entry.resetAt) store.delete(ip);
+  }
+}
 
 export function checkRateLimit(ip: string): { allowed: boolean; retryAfter?: number } {
   const now = Date.now();
+
+  if (++sweepCounter >= SWEEP_EVERY) {
+    sweepCounter = 0;
+    sweep(now);
+  }
+
   const entry = store.get(ip);
 
   if (!entry || now > entry.resetAt) {

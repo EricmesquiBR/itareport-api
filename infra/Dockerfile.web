@@ -10,7 +10,7 @@ RUN pnpm install --frozen-lockfile --filter @itareport/web
 
 # Build
 FROM base AS build
-ARG VITE_API_URL=http://localhost/v1
+ARG VITE_API_URL=http://localhost
 ENV VITE_API_URL=$VITE_API_URL
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/apps/web/node_modules ./apps/web/node_modules

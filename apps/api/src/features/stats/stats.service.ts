@@ -1,4 +1,4 @@
-import { count, eq, and, gt } from "drizzle-orm";
+import { count, eq, and, gt, lte } from "drizzle-orm";
 import { db } from "../../db/index.js";
 import { reports, users, reportVotes } from "../../db/schema.js";
 
@@ -19,7 +19,7 @@ export async function getStats() {
       db
         .select({ value: count() })
         .from(reports)
-        .where(eq(reports.status, "expired")),
+        .where(lte(reports.expiresAt, now)),
       db.select({ value: count() }).from(users),
       db.select({ value: count() }).from(reportVotes),
     ]);

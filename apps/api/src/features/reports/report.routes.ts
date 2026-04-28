@@ -88,8 +88,10 @@ export const reportRoutes = new Hono()
   })
   .get("/", async (c) => {
     try {
-      const page = Math.max(1, parseInt(c.req.query("page") ?? "1"));
-      const limit = Math.min(100, Math.max(1, parseInt(c.req.query("limit") ?? "20")));
+      const pageRaw = Number.parseInt(c.req.query("page") ?? "1", 10);
+      const page = Number.isFinite(pageRaw) ? Math.max(1, pageRaw) : 1;
+      const limitRaw = Number.parseInt(c.req.query("limit") ?? "20", 10);
+      const limit = Number.isFinite(limitRaw) ? Math.min(100, Math.max(1, limitRaw)) : 20;
       const categoryId = c.req.query("categoryId");
       const offset = (page - 1) * limit;
 
@@ -111,6 +113,10 @@ export const reportRoutes = new Hono()
       const { id } = c.req.param();
       const userId = getAuthUserId(c);
       const result = await voteService.addVote(userId, id);
+
+      if ("notFound" in result && result.notFound) {
+        return c.json({ success: false, message: "Report not found" }, 404);
+      }
 
       if ("duplicate" in result && result.duplicate) {
         return c.json({ success: false, message: "Already voted on this report" }, 409);

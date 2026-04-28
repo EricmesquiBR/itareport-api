@@ -67,7 +67,7 @@ export async function findActiveReports({ limit, offset, categoryId }: Paginatio
     db.select({ value: count() }).from(reports).where(and(...conditions)),
   ]);
 
-  const total = countRows[0]?.value ?? 0;
+  const total = Number(countRows[0]?.value ?? 0);
 
   return { data, total, limit, offset };
 }
