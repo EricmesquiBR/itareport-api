@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from "./routes/__root"
 import { Route as ReportFormRouteImport } from "./routes/report-form"
 import { Route as RegisterRouteImport } from "./routes/register"
+import { Route as MeRouteImport } from "./routes/me"
 import { Route as MapRouteImport } from "./routes/map"
 import { Route as LoginRouteImport } from "./routes/login"
 import { Route as AboutRouteImport } from "./routes/about"
@@ -25,6 +26,11 @@ const ReportFormRoute = ReportFormRouteImport.update({
 const RegisterRoute = RegisterRouteImport.update({
   id: "/register",
   path: "/register",
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MeRoute = MeRouteImport.update({
+  id: "/me",
+  path: "/me",
   getParentRoute: () => rootRouteImport,
 } as any)
 const MapRoute = MapRouteImport.update({
@@ -58,6 +64,7 @@ export interface FileRoutesByFullPath {
   "/about": typeof AboutRoute
   "/login": typeof LoginRoute
   "/map": typeof MapRoute
+  "/me": typeof MeRoute
   "/register": typeof RegisterRoute
   "/report-form": typeof ReportFormRoute
   "/reports/$id": typeof ReportsIdRoute
@@ -67,6 +74,7 @@ export interface FileRoutesByTo {
   "/about": typeof AboutRoute
   "/login": typeof LoginRoute
   "/map": typeof MapRoute
+  "/me": typeof MeRoute
   "/register": typeof RegisterRoute
   "/report-form": typeof ReportFormRoute
   "/reports/$id": typeof ReportsIdRoute
@@ -77,6 +85,7 @@ export interface FileRoutesById {
   "/about": typeof AboutRoute
   "/login": typeof LoginRoute
   "/map": typeof MapRoute
+  "/me": typeof MeRoute
   "/register": typeof RegisterRoute
   "/report-form": typeof ReportFormRoute
   "/reports/$id": typeof ReportsIdRoute
@@ -88,6 +97,7 @@ export interface FileRouteTypes {
     | "/about"
     | "/login"
     | "/map"
+    | "/me"
     | "/register"
     | "/report-form"
     | "/reports/$id"
@@ -97,6 +107,7 @@ export interface FileRouteTypes {
     | "/about"
     | "/login"
     | "/map"
+    | "/me"
     | "/register"
     | "/report-form"
     | "/reports/$id"
@@ -106,6 +117,7 @@ export interface FileRouteTypes {
     | "/about"
     | "/login"
     | "/map"
+    | "/me"
     | "/register"
     | "/report-form"
     | "/reports/$id"
@@ -116,6 +128,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   LoginRoute: typeof LoginRoute
   MapRoute: typeof MapRoute
+  MeRoute: typeof MeRoute
   RegisterRoute: typeof RegisterRoute
   ReportFormRoute: typeof ReportFormRoute
   ReportsIdRoute: typeof ReportsIdRoute
@@ -135,6 +148,13 @@ declare module "@tanstack/react-router" {
       path: "/register"
       fullPath: "/register"
       preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    "/me": {
+      id: "/me"
+      path: "/me"
+      fullPath: "/me"
+      preLoaderRoute: typeof MeRouteImport
       parentRoute: typeof rootRouteImport
     }
     "/map": {
@@ -180,6 +200,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   LoginRoute: LoginRoute,
   MapRoute: MapRoute,
+  MeRoute: MeRoute,
   RegisterRoute: RegisterRoute,
   ReportFormRoute: ReportFormRoute,
   ReportsIdRoute: ReportsIdRoute,

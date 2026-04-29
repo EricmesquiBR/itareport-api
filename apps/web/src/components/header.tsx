@@ -40,6 +40,11 @@ export default function Header() {
             >
               Reportar
             </Link>
+            {session?.user?.username && (
+              <Link to="/me" className="text-white">
+                {session.user.username}
+              </Link>
+            )}
             <a href="/" className="text-white" onClick={handleLogout}>
               Sair
             </a>
